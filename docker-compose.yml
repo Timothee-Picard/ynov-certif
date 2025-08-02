@@ -1,0 +1,78 @@
+services:
+#  frontend:
+#    build:
+#      context: ./frontend
+#      dockerfile: Dockerfile
+#      target: ${APP_ENV}
+#    restart: unless-stopped
+#    depends_on:
+#      backend:
+#        condition: service_healthy
+#    ports:
+#      - "3001:3000"
+#    volumes:
+#      - ./frontend:/app
+#    networks:
+#      - default
+#    healthcheck:
+#      test: [ "CMD", "wget", "--spider", "http://frontend:3000/" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ${APP_ENV}
+      args:
+        BUILD_ENV: ${APP_ENV}
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DB_TYPE=postgres
+      - DB_HOST=database
+      - DB_PORT=6432
+      - DB_DATABASE=${DATABASE_NAME}
+      - DB_USERNAME=${DATABASE_USERNAME}
+      - DB_PASSWORD=${DATABASE_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - default
+      - db-back
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "http://backend:3000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  database:
+    image: bitnami/postgresql:latest
+    restart: always
+    volumes:
+      - database_volume:/bitnami/postgresql
+    environment:
+      - POSTGRESQL_USERNAME=${DATABASE_USERNAME}
+      - POSTGRESQL_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRESQL_DATABASE=${DATABASE_NAME}
+      - POSTGRESQL_PORT_NUMBER=6432
+    networks:
+      - db-back
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -p 6432" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  default:
+  db-back:
+
+volumes:
+  database_volume:
