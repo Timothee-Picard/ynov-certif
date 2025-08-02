@@ -1,9 +1,9 @@
 {
   "scripts": {
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
+    "release": "standard-version",
+    "release:push": "git push --follow-tags origin main"
   },
   "devDependencies": {
-    "conventional-changelog-angular": "^8.0.0",
-    "conventional-changelog-cli": "^5.0.0"
+    "standard-version": "^9.5.0"
   }
 }
