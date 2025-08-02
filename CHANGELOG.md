@@ -1,33 +1,10 @@
-#  (2025-08-02)
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [1.0.1](https://github.com/Timothee-Picard/ynov-certif/compare/v1.0.0...v1.0.1) (2025-08-02)
 
 
-### Features
+### Bug Fixes
 
-* add changelog with git actions ([655a5ea](https://github.com/Timothee-Picard/ynov-certif/commit/655a5eaf8cac59481b5b07502f54213b5fdf95a1))
-* add makefile to init project and run with docker compose ([49559fc](https://github.com/Timothee-Picard/ynov-certif/commit/49559fcb16798c1d17f348c21985527b7c6d78fa))
-* add users lists tasks with postgres and swagger ([0258cf0](https://github.com/Timothee-Picard/ynov-certif/commit/0258cf073a036aee054531d583511143894ff93e))
-* init backend ([3f895a8](https://github.com/Timothee-Picard/ynov-certif/commit/3f895a82b6a737012e129abe89c7a0cf3db3f42b))
-
-
-
-#  (2025-08-02)
-
-
-### Features
-
-* add changelog with git actions ([655a5ea](https://github.com/Timothee-Picard/ynov-certif/commit/655a5eaf8cac59481b5b07502f54213b5fdf95a1))
-* add makefile to init project and run with docker compose ([49559fc](https://github.com/Timothee-Picard/ynov-certif/commit/49559fcb16798c1d17f348c21985527b7c6d78fa))
-* init backend ([3f895a8](https://github.com/Timothee-Picard/ynov-certif/commit/3f895a82b6a737012e129abe89c7a0cf3db3f42b))
-
-
-
-#  (2025-07-31)
-
-
-### Features
-
-* add changelog with git actions ([655a5ea](https://github.com/Timothee-Picard/ynov-certif/commit/655a5eaf8cac59481b5b07502f54213b5fdf95a1))
-* init backend ([3f895a8](https://github.com/Timothee-Picard/ynov-certif/commit/3f895a82b6a737012e129abe89c7a0cf3db3f42b))
-
-
-
+* add version package.json ([277b961](https://github.com/Timothee-Picard/ynov-certif/commit/277b96160051498747757bbcbf6d1e39a651b1ec))
