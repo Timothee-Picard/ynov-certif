@@ -1,4 +1,6 @@
 {
+  "name": "ynov-certif",
+  "version": "1.0.0",
   "scripts": {
     "release": "standard-version",
     "release:push": "git push --follow-tags origin main"
