@@ -1,24 +1,24 @@
 services:
-#  frontend:
-#    build:
-#      context: ./frontend
-#      dockerfile: Dockerfile
-#      target: ${APP_ENV}
-#    restart: unless-stopped
-#    depends_on:
-#      backend:
-#        condition: service_healthy
-#    ports:
-#      - "3001:3000"
-#    volumes:
-#      - ./frontend:/app
-#    networks:
-#      - default
-#    healthcheck:
-#      test: [ "CMD", "wget", "--spider", "http://frontend:3000/" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: ${APP_ENV}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./frontend:/app
+    networks:
+      - default
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "http://frontend:3000/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   backend:
     build:
