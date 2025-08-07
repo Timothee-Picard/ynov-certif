@@ -6,7 +6,7 @@ DOCKER_COMPOSE = $(shell if docker compose version > /dev/null 2>&1; then echo "
 init:
 	@echo "Initializing project"
 	@make init-backend
-	# @make init-frontend
+	@make init-frontend
 
 # Backend initialization (NestJS)
 .PHONY: init-backend
