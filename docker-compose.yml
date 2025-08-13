@@ -12,6 +12,7 @@ services:
       - "3001:3000"
     volumes:
       - ./frontend:/app
+      - /app/node_modules
     networks:
       - default
     healthcheck:
@@ -35,6 +36,7 @@ services:
       - "3002:3000"
     volumes:
       - ./backend:/app
+      - /app/node_modules
     environment:
       - DB_TYPE=postgres
       - DB_HOST=database
