@@ -1,11 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { ListService } from './list.service';
 import { CreateListDto } from './dto/create-list.dto';
 import { UpdateListDto } from './dto/update-list.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { User } from '../utils/types';
+import { GetUser } from '../auth/get-user.decorator';
 
 @ApiTags('lists')
 @Controller('list')
+@ApiBearerAuth()
 export class ListController {
   constructor(private readonly listService: ListService) {}
 
@@ -23,13 +42,34 @@ export class ListController {
     return this.listService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('my-lists')
+  @ApiOperation({ summary: 'Récupérer les listes de l’utilisateur connecté' })
+  @ApiResponse({
+    status: 200,
+    description: 'Listes de l’utilisateur trouvées.',
+  })
+  findMyLists(@GetUser() user: User) {
+    return this.listService.findAllByUser(user.id);
+  }
+
   @Get('user/:userId')
   @ApiOperation({ summary: 'Récupérer les listes d’un utilisateur par son ID' })
-  @ApiParam({ name: 'userId', type: Number, description: 'ID de l’utilisateur' })
-  @ApiResponse({ status: 200, description: 'Listes de l’utilisateur trouvées.' })
-  @ApiResponse({ status: 404, description: 'Aucune liste trouvée pour cet utilisateur.' })
+  @ApiParam({
+    name: 'userId',
+    type: Number,
+    description: 'ID de l’utilisateur',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Listes de l’utilisateur trouvées.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Aucune liste trouvée pour cet utilisateur.',
+  })
   findAllByUser(@Param('userId') userId: string) {
-    return this.listService.findAllByUser(+userId);
+    return this.listService.findAllByUser(userId);
   }
 
   @Get(':id')
@@ -38,20 +78,29 @@ export class ListController {
   @ApiResponse({ status: 200, description: 'Liste trouvée.' })
   @ApiResponse({ status: 404, description: 'Liste non trouvée.' })
   findOne(@Param('id') id: string) {
-    return this.listService.findOne(+id);
+    return this.listService.findOne(id);
   }
 
   @Get('user/:userId/:listId')
-  @ApiOperation({ summary: "Récupérer une liste par son ID et l'ID de l'utilisateur" })
-  @ApiParam({ name: 'userId', type: Number, description: "ID de l'utilisateur" })
-  @ApiParam({ name: 'listId', type: Number, description: "ID de la liste" })
+  @ApiOperation({
+    summary: "Récupérer une liste par son ID et l'ID de l'utilisateur",
+  })
+  @ApiParam({
+    name: 'userId',
+    type: Number,
+    description: "ID de l'utilisateur",
+  })
+  @ApiParam({ name: 'listId', type: Number, description: 'ID de la liste' })
   @ApiResponse({ status: 200, description: 'Liste trouvée.' })
-  @ApiResponse({ status: 404, description: 'Liste non trouvée pour cet utilisateur.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Liste non trouvée pour cet utilisateur.',
+  })
   findOneByUser(
-      @Param('userId') userId: string,
-      @Param('listId') listId: string,
+    @Param('userId') userId: string,
+    @Param('listId') listId: string,
   ) {
-    return this.listService.findOneByUser(+userId, +listId);
+    return this.listService.findOneByUser(userId, listId);
   }
 
   @Patch(':id')
@@ -60,7 +109,7 @@ export class ListController {
   @ApiResponse({ status: 200, description: 'Liste mise à jour.' })
   @ApiResponse({ status: 404, description: 'Liste non trouvée.' })
   update(@Param('id') id: string, @Body() updateListDto: UpdateListDto) {
-    return this.listService.update(+id, updateListDto);
+    return this.listService.update(id, updateListDto);
   }
 
   @Delete(':id')
@@ -69,6 +118,6 @@ export class ListController {
   @ApiResponse({ status: 200, description: 'Liste supprimée.' })
   @ApiResponse({ status: 404, description: 'Liste non trouvée.' })
   remove(@Param('id') id: string) {
-    return this.listService.remove(+id);
+    return this.listService.remove(id);
   }
 }

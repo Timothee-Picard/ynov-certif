@@ -9,15 +9,17 @@ import { List } from '../list/entities/list.entity';
 @Injectable()
 export class TaskService {
   constructor(
-      @InjectRepository(Task)
-      private readonly taskRepository: Repository<Task>,
+    @InjectRepository(Task)
+    private readonly taskRepository: Repository<Task>,
 
-      @InjectRepository(List)
-      private readonly listRepository: Repository<List>,
+    @InjectRepository(List)
+    private readonly listRepository: Repository<List>,
   ) {}
 
   async create(createTaskDto: CreateTaskDto) {
-    const list = await this.listRepository.findOne({ where: { id: createTaskDto.listId } });
+    const list = await this.listRepository.findOne({
+      where: { id: createTaskDto.listId },
+    });
     if (!list) throw new NotFoundException('List not found');
 
     const task = this.taskRepository.create({
@@ -35,18 +37,26 @@ export class TaskService {
     return this.taskRepository.find({ relations: ['list'] });
   }
 
-  async findOne(id: number) {
-    const task = await this.taskRepository.findOne({ where: { id }, relations: ['list'] });
+  async findOne(id: string) {
+    const task = await this.taskRepository.findOne({
+      where: { id },
+      relations: ['list'],
+    });
     if (!task) throw new NotFoundException('Task not found');
     return task;
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto) {
-    const task = await this.taskRepository.findOne({ where: { id }, relations: ['list'] });
+  async update(id: string, updateTaskDto: UpdateTaskDto) {
+    const task = await this.taskRepository.findOne({
+      where: { id },
+      relations: ['list'],
+    });
     if (!task) throw new NotFoundException('Task not found');
 
     if (updateTaskDto.listId) {
-      const newList = await this.listRepository.findOne({ where: { id: updateTaskDto.listId } });
+      const newList = await this.listRepository.findOne({
+        where: { id: updateTaskDto.listId },
+      });
       if (!newList) throw new NotFoundException('List not found');
       task.list = newList;
     }
@@ -55,7 +65,7 @@ export class TaskService {
     return this.taskRepository.save(task);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const task = await this.taskRepository.findOne({ where: { id } });
     if (!task) throw new NotFoundException('Task not found');
     await this.taskRepository.remove(task);
