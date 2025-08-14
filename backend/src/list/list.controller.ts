@@ -28,38 +28,19 @@ import { GetUser } from '../auth/get-user.decorator';
 export class ListController {
   constructor(private readonly listService: ListService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  @ApiOperation({ summary: 'Créer une nouvelle liste' })
+  @ApiOperation({
+    summary: 'Créer une nouvelle liste pour l’utilisateur connecté',
+  })
   @ApiResponse({ status: 201, description: 'Liste créée avec succès.' })
-  create(@Body() createListDto: CreateListDto) {
-    return this.listService.create(createListDto);
-  }
-
-  @Get()
-  @ApiOperation({ summary: 'Récupérer toutes les listes' })
-  @ApiResponse({ status: 200, description: 'Liste des listes retournée.' })
-  findAll() {
-    return this.listService.findAll();
+  create(@GetUser() user: Partial<User>, @Body() createListDto: CreateListDto) {
+    return this.listService.create(user.id, createListDto);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('my-lists')
+  @Get('')
   @ApiOperation({ summary: 'Récupérer les listes de l’utilisateur connecté' })
-  @ApiResponse({
-    status: 200,
-    description: 'Listes de l’utilisateur trouvées.',
-  })
-  findMyLists(@GetUser() user: User) {
-    return this.listService.findAllByUser(user.id);
-  }
-
-  @Get('user/:userId')
-  @ApiOperation({ summary: 'Récupérer les listes d’un utilisateur par son ID' })
-  @ApiParam({
-    name: 'userId',
-    type: Number,
-    description: 'ID de l’utilisateur',
-  })
   @ApiResponse({
     status: 200,
     description: 'Listes de l’utilisateur trouvées.',
@@ -68,56 +49,57 @@ export class ListController {
     status: 404,
     description: 'Aucune liste trouvée pour cet utilisateur.',
   })
-  findAllByUser(@Param('userId') userId: string) {
-    return this.listService.findAllByUser(userId);
+  findAllByUser(@GetUser() user: User) {
+    return this.listService.findAllByUser(user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une liste par son ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'ID de la liste' })
-  @ApiResponse({ status: 200, description: 'Liste trouvée.' })
-  @ApiResponse({ status: 404, description: 'Liste non trouvée.' })
-  findOne(@Param('id') id: string) {
-    return this.listService.findOne(id);
-  }
-
-  @Get('user/:userId/:listId')
-  @ApiOperation({
-    summary: "Récupérer une liste par son ID et l'ID de l'utilisateur",
+  @ApiResponse({
+    status: 200,
+    description: 'Liste trouvée.',
   })
-  @ApiParam({
-    name: 'userId',
-    type: Number,
-    description: "ID de l'utilisateur",
-  })
-  @ApiParam({ name: 'listId', type: Number, description: 'ID de la liste' })
-  @ApiResponse({ status: 200, description: 'Liste trouvée.' })
   @ApiResponse({
     status: 404,
-    description: 'Liste non trouvée pour cet utilisateur.',
+    description: 'Aucune liste trouvée avec cet ID.',
   })
-  findOneByUser(
-    @Param('userId') userId: string,
-    @Param('listId') listId: string,
-  ) {
-    return this.listService.findOneByUser(userId, listId);
+  findOneByUser(@GetUser() user: User, @Param('id') id: string) {
+    return this.listService.findOneByUser(user.id, id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Mettre à jour une liste par son ID' })
   @ApiParam({ name: 'id', type: Number, description: 'ID de la liste' })
   @ApiResponse({ status: 200, description: 'Liste mise à jour.' })
   @ApiResponse({ status: 404, description: 'Liste non trouvée.' })
-  update(@Param('id') id: string, @Body() updateListDto: UpdateListDto) {
-    return this.listService.update(id, updateListDto);
+  @ApiResponse({
+    status: 403,
+    description: "Action interdite si vous n'êtes pas le propriétaire",
+  })
+  update(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Body() updateListDto: UpdateListDto,
+  ) {
+    return this.listService.update(user.id, id, updateListDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  @ApiOperation({ summary: 'Supprimer une liste par son ID' })
+  @ApiOperation({
+    summary:
+      'Supprimer une liste par son ID si elle appartient à l’utilisateur connecté',
+  })
   @ApiParam({ name: 'id', type: Number, description: 'ID de la liste' })
   @ApiResponse({ status: 200, description: 'Liste supprimée.' })
+  @ApiResponse({
+    status: 403,
+    description: "Vous n'êtes pas autorisé à supprimer cette liste.",
+  })
   @ApiResponse({ status: 404, description: 'Liste non trouvée.' })
-  remove(@Param('id') id: string) {
-    return this.listService.remove(id);
+  remove(@GetUser() user: Partial<User>, @Param('id') id: string) {
+    return this.listService.remove(user.id, id);
   }
 }
