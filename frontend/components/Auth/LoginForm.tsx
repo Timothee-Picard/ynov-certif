@@ -103,7 +103,7 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
 						onClick={onSwitchToRegister}
 						className="text-blue-600 hover:text-blue-700 text-sm font-medium"
 					>
-						Pas encore de compte ? S'inscrire
+						Pas encore de compte ? S&#39;inscrire
 					</button>
 				</div>
 

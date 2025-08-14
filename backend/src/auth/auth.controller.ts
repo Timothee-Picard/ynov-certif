@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import {
   AuthToken,
   LoginCredentials,
-  RegisterCredentials,
   User,
 } from '../utils/types';
 import {
@@ -57,7 +56,7 @@ export class AuthController {
       },
     },
   })
-  register(@Body() data: RegisterCredentials): Promise<AuthToken> {
+  register(@Body() data: RegisterCredentialsDto): Promise<AuthToken> {
     return this.authService.register(data);
   }
 

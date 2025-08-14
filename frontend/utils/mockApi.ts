@@ -65,7 +65,6 @@ export const userApi = {
 
 export const todoListApi = {
     async getTodoLists(): Promise<TodoList[]> {
-        console.log('token storage:', localStorage.getItem("token"))
         const res = await fetch(`${API_URL}/list`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { ArrowLeft, Plus, Loader2, Search, Filter } from 'lucide-react';
-import {Task, TodoList} from "@/utils/types";
+import {Task} from "@/utils/types";
 import {useTasks} from "@/hooks/useTasks";
 import {TaskItem} from "@/components/Tasks/TaskItem";
 import {TaskForm} from "@/components/Tasks/TaskForm";
@@ -80,7 +80,7 @@ export function TodoListPage({ id }: TodoListPageProps) {
 		return (
 			<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				<div className="text-center text-gray-600">
-					<p>La liste de tâches n'a pas été trouvée.</p>
+					<p>La liste de tâches n&#39;a pas été trouvée.</p>
 					<button
 						onClick={() => router.push('/')}
 						className="mt-4 text-blue-600 hover:text-blue-700"
@@ -108,7 +108,7 @@ export function TodoListPage({ id }: TodoListPageProps) {
 						style={{ backgroundColor: todoList.color }}
 					/>
 					<div>
-						<h1 className="text-2xl font-bold text-gray-900">{todoList.title}</h1>
+						<h1 className="text-2xl font-bold text-gray-900">{todoList.name}</h1>
 						{todoList.description && (
 							<p className="text-gray-600 mt-1">{todoList.description}</p>
 						)}

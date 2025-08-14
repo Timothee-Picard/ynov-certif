@@ -42,5 +42,5 @@ export interface LoginCredentials {
 export interface RegisterCredentials {
   email: string;
   password: string;
-  name: string;
+  username: string;
 }

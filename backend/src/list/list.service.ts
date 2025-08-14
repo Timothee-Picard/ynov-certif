@@ -23,6 +23,8 @@ export class ListService {
   async create(userId: string, createListDto: CreateListDto) {
     const list = this.listRepository.create({
       name: createListDto.name,
+      description: createListDto.description,
+      color: createListDto.color,
       user: { id: userId },
     });
 
@@ -72,6 +74,14 @@ export class ListService {
 
     if (updateListDto.name !== undefined) {
       list.name = updateListDto.name;
+    }
+
+    if (updateListDto.description !== undefined) {
+      list.description = updateListDto.description;
+    }
+
+    if (updateListDto.color !== undefined) {
+      list.color = updateListDto.color;
     }
 
     return this.listRepository.save(list);

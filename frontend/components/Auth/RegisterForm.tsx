@@ -9,7 +9,7 @@ interface RegisterFormProps {
 export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 	const { register, loading } = useAuth();
 	const [formData, setFormData] = useState({
-		name: '',
+		username: '',
 		email: '',
 		password: '',
 		confirmPassword: ''
@@ -32,7 +32,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
 		try {
 			await register({
-				name: formData.name,
+                username: formData.username,
 				email: formData.email,
 				password: formData.password
 			});
@@ -64,17 +64,17 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 					)}
 
 					<div>
-						<label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-							Nom complet
+						<label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+						    Nom d&#39;utilisateur
 						</label>
 						<div className="relative">
 							<User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
 							<input
-								id="name"
-								name="name"
+								id="username"
+								name="username"
 								type="text"
 								required
-								value={formData.name}
+								value={formData.username}
 								onChange={handleChange}
 								className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 								placeholder="John Doe"

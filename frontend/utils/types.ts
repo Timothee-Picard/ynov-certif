@@ -1,7 +1,7 @@
 export interface User {
 	id: string;
 	email: string;
-	name: string;
+    username: string;
 	avatar?: string;
 	createdAt: string;
 }
@@ -9,7 +9,7 @@ export interface User {
 export interface TodoList {
 	id: string;
 	userId: string;
-	title: string;
+    name: string;
 	description?: string;
 	color: string;
 	createdAt: string;
@@ -42,5 +42,5 @@ export interface LoginCredentials {
 export interface RegisterCredentials {
 	email: string;
 	password: string;
-	name: string;
+    username: string;
 }
