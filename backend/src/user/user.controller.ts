@@ -1,63 +1,53 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
-  Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { GetUser } from '../auth/get-user.decorator';
+import { User } from '../utils/types';
 
+@ApiBearerAuth()
 @ApiTags('users')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
-  @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès.' })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
-  @Get()
-  @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
-  @ApiResponse({
-    status: 200,
-    description: 'Liste des utilisateurs retournée.',
-  })
-  findAll() {
-    return this.userService.findAll();
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Récupérer un utilisateur par son ID' })
-  @ApiParam({ name: 'id', type: Number, description: "ID de l'utilisateur" })
+  @UseGuards(JwtAuthGuard)
+  @Get('')
+  @ApiOperation({ summary: 'Récupère les données de l’utilisateur connecté' })
   @ApiResponse({ status: 200, description: 'Utilisateur trouvé.' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé.' })
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+  findMe(@GetUser() user: User) {
+    return this.userService.findOne(user.id);
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Mettre à jour un utilisateur par son ID' })
-  @ApiParam({ name: 'id', type: Number, description: "ID de l'utilisateur" })
+  @UseGuards(JwtAuthGuard)
+  @Patch('')
+  @ApiOperation({ summary: 'Met à jour les données de l’utilisateur connecté' })
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour.' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé.' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  update(@GetUser() user: User, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(user.id, updateUserDto);
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Supprimer un utilisateur par son ID' })
-  @ApiParam({ name: 'id', type: Number, description: "ID de l'utilisateur" })
+  @UseGuards(JwtAuthGuard)
+  @Delete('')
+  @ApiOperation({ summary: 'Supprime l’utilisateur connecté' })
   @ApiResponse({ status: 200, description: 'Utilisateur supprimé.' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé.' })
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  remove(@GetUser() user: User) {
+    return this.userService.remove(user.id);
   }
 }

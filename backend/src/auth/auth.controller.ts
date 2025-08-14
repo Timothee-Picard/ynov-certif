@@ -1,6 +1,5 @@
-import { Controller, Post, Body, Get, Headers } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { User } from '../user/entities/user.entity';
 import {
   AuthToken,
   LoginCredentials,
@@ -51,16 +50,5 @@ export class AuthController {
   })
   register(@Body() data: RegisterCredentials): Promise<AuthToken> {
     return this.authService.register(data);
-  }
-
-  @Get('validate')
-  @ApiOperation({ summary: 'Valider un token JWT' })
-  @ApiResponse({ status: 200, description: 'Utilisateur trouvé', type: Object })
-  async validate(
-    @Headers('authorization') authHeader: string,
-  ): Promise<User | null> {
-    if (!authHeader?.startsWith('Bearer ')) return null;
-    const token = authHeader.split(' ')[1];
-    return this.authService.validateUserFromToken(token);
   }
 }

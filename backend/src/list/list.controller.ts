@@ -22,9 +22,9 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { User } from '../utils/types';
 import { GetUser } from '../auth/get-user.decorator';
 
+@ApiBearerAuth()
 @ApiTags('lists')
 @Controller('list')
-@ApiBearerAuth()
 export class ListController {
   constructor(private readonly listService: ListService) {}
 

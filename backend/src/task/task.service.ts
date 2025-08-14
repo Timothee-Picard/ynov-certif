@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Task } from './entities/task.entity';
@@ -16,11 +21,14 @@ export class TaskService {
     private readonly listRepository: Repository<List>,
   ) {}
 
-  async create(createTaskDto: CreateTaskDto) {
+  async create(userId: string, createTaskDto: CreateTaskDto) {
     const list = await this.listRepository.findOne({
       where: { id: createTaskDto.listId },
+      relations: ['user'],
     });
     if (!list) throw new NotFoundException('List not found');
+    if (list.user.id !== userId)
+      throw new UnauthorizedException('List does not belong to the user');
 
     const task = this.taskRepository.create({
       title: createTaskDto.title,
@@ -33,10 +41,6 @@ export class TaskService {
     return this.taskRepository.save(task);
   }
 
-  async findAll() {
-    return this.taskRepository.find({ relations: ['list'] });
-  }
-
   async findOne(id: string) {
     const task = await this.taskRepository.findOne({
       where: { id },
@@ -46,18 +50,30 @@ export class TaskService {
     return task;
   }
 
-  async update(id: string, updateTaskDto: UpdateTaskDto) {
+  async update(userId: string, taskId: string, updateTaskDto: UpdateTaskDto) {
     const task = await this.taskRepository.findOne({
-      where: { id },
-      relations: ['list'],
+      where: { id: taskId },
+      relations: ['list', 'list.user'],
     });
     if (!task) throw new NotFoundException('Task not found');
+
+    if (task.list.user.id !== userId) {
+      throw new ForbiddenException(
+        "Vous n'avez pas la permission de modifier cette tâche",
+      );
+    }
 
     if (updateTaskDto.listId) {
       const newList = await this.listRepository.findOne({
         where: { id: updateTaskDto.listId },
+        relations: ['user'],
       });
       if (!newList) throw new NotFoundException('List not found');
+      if (newList.user.id !== userId) {
+        throw new ForbiddenException(
+          'Vous ne pouvez pas déplacer la tâche vers une liste qui ne vous appartient pas',
+        );
+      }
       task.list = newList;
     }
 
@@ -65,9 +81,20 @@ export class TaskService {
     return this.taskRepository.save(task);
   }
 
-  async remove(id: string) {
-    const task = await this.taskRepository.findOne({ where: { id } });
+  async remove(userId: string, taskId: string) {
+    const task = await this.taskRepository.findOne({
+      where: { id: taskId },
+      relations: ['list'],
+    });
+
     if (!task) throw new NotFoundException('Task not found');
+
+    if (task.list.user.id !== userId) {
+      throw new ForbiddenException(
+        "Vous n'avez pas la permission de supprimer cette tâche",
+      );
+    }
+
     await this.taskRepository.remove(task);
     return { message: 'Task deleted successfully' };
   }
