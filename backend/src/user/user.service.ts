@@ -9,8 +9,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UserService {
   constructor(
-      @InjectRepository(User)
-      private readonly userRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -26,13 +26,16 @@ export class UserService {
     return this.userRepository.find({ relations: ['lists'] });
   }
 
-  async findOne(id: number) {
-    const user = await this.userRepository.findOne({ where: { id }, relations: ['lists'] });
+  async findOne(id: string) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['lists'],
+    });
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
 
@@ -44,7 +47,7 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException('User not found');
     await this.userRepository.remove(user);

@@ -9,15 +9,17 @@ import { UpdateListDto } from './dto/update-list.dto';
 @Injectable()
 export class ListService {
   constructor(
-      @InjectRepository(List)
-      private readonly listRepository: Repository<List>,
+    @InjectRepository(List)
+    private readonly listRepository: Repository<List>,
 
-      @InjectRepository(User)
-      private readonly userRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async create(createListDto: CreateListDto) {
-    const user = await this.userRepository.findOne({ where: { id: createListDto.userId } });
+    const user = await this.userRepository.findOne({
+      where: { id: createListDto.userId },
+    });
     if (!user) throw new NotFoundException('User not found');
 
     const list = this.listRepository.create({
@@ -32,7 +34,7 @@ export class ListService {
     return this.listRepository.find({ relations: ['user', 'tasks'] });
   }
 
-  async findAllByUser(userId: number) {
+  async findAllByUser(userId: string) {
     const lists = await this.listRepository.find({
       where: {
         user: { id: userId },
@@ -46,14 +48,16 @@ export class ListService {
     return lists;
   }
 
-
-  async findOne(id: number) {
-    const list = await this.listRepository.findOne({ where: { id }, relations: ['user', 'tasks'] });
+  async findOne(id: string) {
+    const list = await this.listRepository.findOne({
+      where: { id },
+      relations: ['user', 'tasks'],
+    });
     if (!list) throw new NotFoundException('List not found');
     return list;
   }
 
-  async findOneByUser(userId: number, listId: number) {
+  async findOneByUser(userId: string, listId: string) {
     const list = await this.listRepository.findOne({
       where: {
         id: listId,
@@ -62,18 +66,25 @@ export class ListService {
     });
 
     if (!list) {
-      throw new NotFoundException(`Liste #${listId} non trouvée pour l'utilisateur #${userId}`);
+      throw new NotFoundException(
+        `Liste #${listId} non trouvée pour l'utilisateur #${userId}`,
+      );
     }
 
     return list;
   }
 
-  async update(id: number, updateListDto: UpdateListDto) {
-    const list = await this.listRepository.findOne({ where: { id }, relations: ['user', 'tasks'] });
+  async update(id: string, updateListDto: UpdateListDto) {
+    const list = await this.listRepository.findOne({
+      where: { id },
+      relations: ['user', 'tasks'],
+    });
     if (!list) throw new NotFoundException('List not found');
 
     if (updateListDto.userId) {
-      const user = await this.userRepository.findOne({ where: { id: updateListDto.userId } });
+      const user = await this.userRepository.findOne({
+        where: { id: updateListDto.userId },
+      });
       if (!user) throw new NotFoundException('User not found');
       list.user = user;
     }
@@ -85,7 +96,7 @@ export class ListService {
     return this.listRepository.save(list);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const list = await this.listRepository.findOne({ where: { id } });
     if (!list) throw new NotFoundException('List not found');
 

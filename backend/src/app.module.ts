@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import {HealthController} from "./health.controller";
-import {ConfigModule} from "@nestjs/config";
-import {TypeOrmModule} from "@nestjs/typeorm";
+import { HealthController } from './health.controller';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { ListModule } from './list/list.module';
 import { TaskModule } from './task/task.module';
+import { AuthModule } from './auth/auth.module';
 
-type dbType = 'mysql' | 'mariadb' | 'postgres' | 'sqlite' | 'mongodb'
+type dbType = 'mysql' | 'mariadb' | 'postgres' | 'sqlite' | 'mongodb';
 
 const validDbTypes: dbType[] = [
   'mysql',
@@ -16,12 +17,12 @@ const validDbTypes: dbType[] = [
   'postgres',
   'sqlite',
   'mongodb',
-]
+];
 
-const dbType = process.env.DB_TYPE as dbType | undefined
+const dbType = process.env.DB_TYPE as dbType | undefined;
 
 if (!dbType || !validDbTypes.includes(dbType)) {
-  throw new Error('Invalid or missing DB_TYPE environment variable')
+  throw new Error('Invalid or missing DB_TYPE environment variable');
 }
 
 @Module({
@@ -40,6 +41,7 @@ if (!dbType || !validDbTypes.includes(dbType)) {
       synchronize: true,
       logging: true,
     }),
+    AuthModule,
     UserModule,
     ListModule,
     TaskModule,

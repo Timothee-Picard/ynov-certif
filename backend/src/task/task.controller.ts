@@ -1,17 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
-@ApiTags('tasks')  // Groupe les routes dans Swagger sous "tasks"
+@ApiTags('tasks') // Groupe les routes dans Swagger sous "tasks"
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Post()
   @ApiOperation({ summary: 'Créer une nouvelle tâche' })
-  @ApiResponse({ status: 201, description: 'La tâche a été créée avec succès.' })
+  @ApiResponse({
+    status: 201,
+    description: 'La tâche a été créée avec succès.',
+  })
   create(@Body() createTaskDto: CreateTaskDto) {
     return this.taskService.create(createTaskDto);
   }
@@ -29,7 +40,7 @@ export class TaskController {
   @ApiResponse({ status: 200, description: 'La tâche trouvée.' })
   @ApiResponse({ status: 404, description: 'Tâche non trouvée.' })
   findOne(@Param('id') id: string) {
-    return this.taskService.findOne(+id);
+    return this.taskService.findOne(id);
   }
 
   @Patch(':id')
@@ -38,7 +49,7 @@ export class TaskController {
   @ApiResponse({ status: 200, description: 'La tâche a été mise à jour.' })
   @ApiResponse({ status: 404, description: 'Tâche non trouvée.' })
   update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.taskService.update(+id, updateTaskDto);
+    return this.taskService.update(id, updateTaskDto);
   }
 
   @Delete(':id')
@@ -47,6 +58,6 @@ export class TaskController {
   @ApiResponse({ status: 200, description: 'La tâche a été supprimée.' })
   @ApiResponse({ status: 404, description: 'Tâche non trouvée.' })
   remove(@Param('id') id: string) {
-    return this.taskService.remove(+id);
+    return this.taskService.remove(id);
   }
 }
