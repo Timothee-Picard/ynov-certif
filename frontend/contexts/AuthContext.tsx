@@ -49,6 +49,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		try {
 			const tokenData = await authApi.login(credentials);
 			authStorage.setToken(tokenData);
+            localStorage.setItem('token', tokenData.token);
 			setUser(tokenData.user);
 		} finally {
 			setLoading(false);
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		try {
 			const tokenData = await authApi.register(credentials);
 			authStorage.setToken(tokenData);
+            localStorage.setItem('token', tokenData.token);
 			setUser(tokenData.user);
 		} finally {
 			setLoading(false);

@@ -33,8 +33,16 @@ export const authApi = {
 };
 
 export const userApi = {
-    async updateProfile(userId: string, updates: Partial<User>): Promise<User> {
-        const res = await fetch(`${API_URL}/users/${userId}`, {
+    async getProfile(): Promise<User> {
+        const res = await fetch(`${API_URL}/user`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        if (!res.ok) throw new Error(await res.text());
+        return res.json();
+    },
+
+    async updateProfile(updates: Partial<User>): Promise<User> {
+        const res = await fetch(`${API_URL}/user`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -46,44 +54,40 @@ export const userApi = {
         return res.json();
     },
 
-    async getProfile(userId: string): Promise<User> {
-        const res = await fetch(`${API_URL}/users/${userId}`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+    async deleteProfile(): Promise<void> {
+        const res = await fetch(`${API_URL}/user`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (!res.ok) throw new Error(await res.text());
-        return res.json();
-    }
+    },
 };
 
 export const todoListApi = {
-    async getTodoLists(userId: string): Promise<TodoList[]> {
-        const res = await fetch(`${API_URL}/users/${userId}/todolists`, {
+    async getTodoLists(): Promise<TodoList[]> {
+        console.log('token storage:', localStorage.getItem("token"))
+        const res = await fetch(`${API_URL}/list`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (!res.ok) throw new Error(await res.text());
         return res.json();
     },
 
-    async createTodoList(
-        userId: string,
-        data: Omit<TodoList, "id" | "userId" | "createdAt" | "updatedAt">
-    ): Promise<TodoList> {
-        const res = await fetch(`${API_URL}/todolists`, {
+    async createTodoList(data: Omit<TodoList, "id" | "userId" | "createdAt" | "updatedAt">): Promise<TodoList> {
+        const res = await fetch(`${API_URL}/list`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-            body: JSON.stringify({ ...data, userId }),
+            body: JSON.stringify(data),
         });
         if (!res.ok) throw new Error(await res.text());
         return res.json();
     },
 
     async updateTodoList(listId: string, data: Partial<TodoList>): Promise<TodoList> {
-        const res = await fetch(`${API_URL}/todolists/${listId}`, {
+        const res = await fetch(`${API_URL}/list/${listId}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -96,7 +100,7 @@ export const todoListApi = {
     },
 
     async deleteTodoList(listId: string): Promise<void> {
-        const res = await fetch(`${API_URL}/todolists/${listId}`, {
+        const res = await fetch(`${API_URL}/list/${listId}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
@@ -104,29 +108,26 @@ export const todoListApi = {
     },
 
     async getTodoListById(listId: string): Promise<TodoList | null> {
-        const res = await fetch(`${API_URL}/todolists/${listId}`, {
+        const res = await fetch(`${API_URL}/list/${listId}`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (res.status === 404) return null;
         if (!res.ok) throw new Error(await res.text());
         return res.json();
-    }
+    },
 };
 
 export const taskApi = {
     async getTasks(listId: string): Promise<Task[]> {
-        const res = await fetch(`${API_URL}/todolists/${listId}/tasks`, {
+        const res = await fetch(`${API_URL}/list/${listId}/tasks`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (!res.ok) throw new Error(await res.text());
         return res.json();
     },
 
-    async createTask(
-        listId: string,
-        data: Omit<Task, "id" | "listId" | "createdAt" | "updatedAt">
-    ): Promise<Task> {
-        const res = await fetch(`${API_URL}/tasks`, {
+    async createTask(listId: string, data: Omit<Task, "id" | "listId" | "createdAt" | "updatedAt">): Promise<Task> {
+        const res = await fetch(`${API_URL}/task`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -139,7 +140,7 @@ export const taskApi = {
     },
 
     async updateTask(taskId: string, data: Partial<Task>): Promise<Task> {
-        const res = await fetch(`${API_URL}/tasks/${taskId}`, {
+        const res = await fetch(`${API_URL}/task/${taskId}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -152,7 +153,7 @@ export const taskApi = {
     },
 
     async deleteTask(taskId: string): Promise<void> {
-        const res = await fetch(`${API_URL}/tasks/${taskId}`, {
+        const res = await fetch(`${API_URL}/task/${taskId}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
@@ -160,11 +161,11 @@ export const taskApi = {
     },
 
     async toggleTaskComplete(taskId: string): Promise<Task> {
-        const res = await fetch(`${API_URL}/tasks/${taskId}/toggle`, {
+        const res = await fetch(`${API_URL}/task/${taskId}/toggle`, {
             method: "PATCH",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (!res.ok) throw new Error(await res.text());
         return res.json();
-    }
+    },
 };

@@ -91,4 +91,30 @@ export class AuthService {
       },
     };
   }
+
+  async validateToken(userId: string): Promise<AuthToken | null> {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+
+      if (!user) return null;
+
+      const token = this.jwtService.sign({ sub: user.id });
+
+      return {
+        token,
+        expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.username,
+          avatar: user.avatar || undefined,
+          createdAt: user.createdAt.toISOString(),
+        },
+      };
+    } catch (error) {
+      return null;
+    }
+  }
 }

@@ -36,10 +36,6 @@ export class ListService {
       },
     });
 
-    if (!lists || lists.length === 0) {
-      throw new NotFoundException('Aucune liste trouvée pour cet utilisateur.');
-    }
-
     return lists;
   }
 

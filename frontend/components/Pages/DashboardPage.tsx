@@ -9,8 +9,7 @@ import {TodoListForm} from "@/components/TodoLists/TodoListForm";
 import {useRouter} from "next/navigation";
 
 export function DashboardPage() {
-	const { user } = useAuth();
-	const { todoLists, loading, error, createTodoList, updateTodoList, deleteTodoList } = useTodoLists(user?.id || null);
+	const { todoLists, loading, error, createTodoList, updateTodoList, deleteTodoList } = useTodoLists();
 
 	const router = useRouter();
 	const [showForm, setShowForm] = useState(false);
@@ -138,7 +137,7 @@ export function DashboardPage() {
 				<div className="text-center py-12">
 					{searchTerm ? (
 						<div>
-							<p className="text-gray-500 mb-4">Aucune liste trouvée pour "{searchTerm}"</p>
+							<p className="text-gray-500 mb-4">Aucune liste trouvée pour &#34;{searchTerm}&#34;</p>
 							<button
 								onClick={() => setSearchTerm('')}
 								className="text-blue-600 hover:text-blue-700"

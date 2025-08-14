@@ -2,23 +2,19 @@ import { useState, useEffect } from 'react';
 import { TodoList } from '@/utils/types';
 import { todoListApi } from '@/utils/mockApi';
 
-export function useTodoLists(userId: string | null) {
+export function useTodoLists() {
 	const [todoLists, setTodoLists] = useState<TodoList[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (!userId) {
-			setTodoLists([]);
-			setLoading(false);
-			return;
-		}
-
 		const fetchTodoLists = async () => {
 			try {
 				setLoading(true);
 				setError(null);
-				const lists = await todoListApi.getTodoLists(userId);
+                console.log('Fetching todo lists...');
+				const lists = await todoListApi.getTodoLists();
+                console.log(lists)
 				setTodoLists(lists);
 			} catch (err) {
 				setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
@@ -28,12 +24,10 @@ export function useTodoLists(userId: string | null) {
 		};
 
 		fetchTodoLists();
-	}, [userId]);
+	}, []);
 
 	const createTodoList = async (data: Omit<TodoList, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
-		if (!userId) throw new Error('User not authenticated');
-
-		const newList = await todoListApi.createTodoList(userId, data);
+		const newList = await todoListApi.createTodoList(data);
 		setTodoLists(prev => [...prev, newList]);
 		return newList;
 	};
@@ -56,10 +50,10 @@ export function useTodoLists(userId: string | null) {
 		createTodoList,
 		updateTodoList,
 		deleteTodoList,
-		refetch: () => {
-			if (userId) {
-				todoListApi.getTodoLists(userId).then(setTodoLists);
-			}
-		}
+		// refetch: () => {
+		// 	if (userId) {
+		// 		todoListApi.getTodoLists().then(setTodoLists);
+		// 	}
+		// }
 	};
 }

@@ -1,13 +1,22 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   AuthToken,
   LoginCredentials,
   RegisterCredentials,
+  User,
 } from '../utils/types';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { LoginCredentialsDto } from './dto/login-credentials.dto';
 import { RegisterCredentialsDto } from './dto/register-credentials.dto';
+import { GetUser } from './get-user.decorator';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -50,5 +59,22 @@ export class AuthController {
   })
   register(@Body() data: RegisterCredentials): Promise<AuthToken> {
     return this.authService.register(data);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('validate')
+  @ApiOperation({ summary: 'Validation du token utilisateur' })
+  @ApiResponse({
+    status: 200,
+    description: 'Token valide, utilisateur trouvé',
+    type: Object,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token invalide ou expiré',
+  })
+  validateToken(@GetUser() user: User): Promise<AuthToken | null> {
+    return this.authService.validateToken(user.id);
   }
 }
