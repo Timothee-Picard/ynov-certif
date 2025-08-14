@@ -91,16 +91,4 @@ export class AuthService {
       },
     };
   }
-
-  async validateUserFromToken(token: string): Promise<User | null> {
-    try {
-      const payload = this.jwtService.verify(token);
-      const user = await this.userRepository.findOne({
-        where: { id: payload.id },
-      });
-      return user || null;
-    } catch {
-      return null;
-    }
-  }
 }

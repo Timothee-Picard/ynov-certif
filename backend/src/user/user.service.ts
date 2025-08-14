@@ -13,26 +13,15 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = this.userRepository.create({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-    return this.userRepository.save(user);
-  }
-
-  async findAll() {
-    return this.userRepository.find({ relations: ['lists'] });
-  }
-
   async findOne(id: string) {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['lists'],
     });
     if (!user) throw new NotFoundException('User not found');
-    return user;
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user;
+    return result;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {

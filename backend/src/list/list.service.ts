@@ -49,6 +49,7 @@ export class ListService {
         id: listId,
         user: { id: userId },
       },
+      relations: ['tasks'],
     });
 
     if (!list) {

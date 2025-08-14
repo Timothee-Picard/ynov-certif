@@ -1,11 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsString,
-  IsOptional,
-  IsBoolean,
-  IsDateString,
-  IsNumber,
-} from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsDateString } from 'class-validator';
 
 export class CreateTaskDto {
   @ApiProperty({ example: 'Acheter du lait', description: 'Titre de la tâche' })
@@ -34,6 +28,6 @@ export class CreateTaskDto {
   dueDate?: string;
 
   @ApiProperty({ example: 1, description: 'ID de la liste associée' })
-  @IsNumber()
+  @IsString()
   listId: string;
 }
