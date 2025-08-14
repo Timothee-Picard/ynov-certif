@@ -12,9 +12,7 @@ export function useTodoLists() {
 			try {
 				setLoading(true);
 				setError(null);
-                console.log('Fetching todo lists...');
 				const lists = await todoListApi.getTodoLists();
-                console.log(lists)
 				setTodoLists(lists);
 			} catch (err) {
 				setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
@@ -27,7 +25,7 @@ export function useTodoLists() {
 	}, []);
 
 	const createTodoList = async (data: Omit<TodoList, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
-		const newList = await todoListApi.createTodoList(data);
+        const newList = await todoListApi.createTodoList(data);
 		setTodoLists(prev => [...prev, newList]);
 		return newList;
 	};

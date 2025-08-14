@@ -7,6 +7,10 @@ export function useTodoList(listId: string | null) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        console.log(todoList)
+    }, [todoList]);
+
 	useEffect(() => {
 		if (!listId) {
 			setTodoList(null);

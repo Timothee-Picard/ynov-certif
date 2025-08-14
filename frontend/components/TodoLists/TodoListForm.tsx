@@ -16,7 +16,7 @@ const colors = [
 
 export function TodoListForm({ list, onSave, onCancel, loading = false }: TodoListFormProps) {
 	const [formData, setFormData] = useState({
-		title: '',
+		name: '',
 		description: '',
 		color: colors[0]
 	});
@@ -24,13 +24,13 @@ export function TodoListForm({ list, onSave, onCancel, loading = false }: TodoLi
 	useEffect(() => {
 		if (list) {
 			setFormData({
-				title: list.title,
+                name: list.name,
 				description: list.description || '',
 				color: list.color
 			});
 		} else {
 			setFormData({
-				title: '',
+                name: '',
 				description: '',
 				color: colors[0]
 			});
@@ -67,15 +67,15 @@ export function TodoListForm({ list, onSave, onCancel, loading = false }: TodoLi
 
 					<form onSubmit={handleSubmit} className="space-y-6">
 						<div>
-							<label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+							<label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
 								Titre *
 							</label>
 							<input
-								id="title"
-								name="title"
+								id="name"
+								name="name"
 								type="text"
 								required
-								value={formData.title}
+								value={formData.name}
 								onChange={handleChange}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 								placeholder="Nom de la liste"
@@ -128,7 +128,7 @@ export function TodoListForm({ list, onSave, onCancel, loading = false }: TodoLi
 							</button>
 							<button
 								type="submit"
-								disabled={loading || !formData.title.trim()}
+								disabled={loading || !formData.name.trim()}
 								className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
 							>
 								{loading ? (

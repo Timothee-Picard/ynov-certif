@@ -54,7 +54,7 @@ export function TodoListCard({
 
 			<div className="mb-4">
 				<h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-					{todoList.title}
+					{todoList.name}
 				</h3>
 				{todoList.description && (
 					<p className="text-gray-600 text-sm line-clamp-2">{todoList.description}</p>

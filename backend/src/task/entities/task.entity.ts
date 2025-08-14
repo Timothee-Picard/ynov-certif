@@ -9,7 +9,7 @@ import { List } from '../../list/entities/list.entity';
 
 @Entity('tasks')
 export class Task {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()

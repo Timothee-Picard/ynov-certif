@@ -44,12 +44,13 @@ export function DashboardPage() {
 	}, [todoLists]);
 
 	const filteredLists = todoLists.filter(list =>
-		list.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+		list.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
 		(list.description && list.description.toLowerCase().includes(searchTerm.toLowerCase()))
 	);
 
 	const handleSaveList = async (data: Omit<TodoList, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
 		setFormLoading(true);
+        console.log('Saving list:', data, 'Editing:', editingList);
 		try {
 			if (editingList) {
 				await updateTodoList(editingList.id, data);
