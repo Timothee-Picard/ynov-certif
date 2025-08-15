@@ -1,16 +1,26 @@
 'use client';
-import {ChangeEvent, FormEvent, useState} from 'react';
+import {ChangeEvent, FormEvent, useEffect, useState} from 'react';
 import { User, Mail, Save, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { userApi } from '@/utils/mockApi';
 
 export function ProfileForm() {
-	const { user, updateUser } = useAuth();
+	const { user, updateUser, logout } = useAuth();
 	const [formData, setFormData] = useState({
-		name: user?.name || '',
+		username: user?.username || '',
 		email: user?.email || '',
 		avatar: user?.avatar || ''
 	});
+
+	useEffect(() => {
+		if (user) {
+			setFormData({
+				username: user.username || '',
+				email: user.email || '',
+				avatar: user.avatar || ''
+			});
+		}
+	}, [user]);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState('');
 	const [error, setError] = useState('');
@@ -24,7 +34,7 @@ export function ProfileForm() {
 		setSuccess('');
 
 		try {
-			const updatedUser = await userApi.updateProfile(user.id, formData);
+			const updatedUser = await userApi.updateProfile(formData);
 			updateUser(updatedUser);
 			setSuccess('Profil mis à jour avec succès !');
 		} catch (err) {
@@ -33,6 +43,25 @@ export function ProfileForm() {
 			setLoading(false);
 		}
 	};
+
+	const handleDeleteAccount = async () => {
+		if (!user) return;
+		if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) {
+			return;
+		}
+		setLoading(true);
+		setError('');
+		setSuccess('');
+		try {
+			await userApi.deleteProfile();
+			logout();
+			setSuccess('Compte supprimé avec succès.');
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Erreur lors de la suppression du compte');
+		} finally {
+			setLoading(false);
+		}
+	}
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setFormData(prev => ({
@@ -95,17 +124,17 @@ export function ProfileForm() {
 					</div>
 
 					<div>
-						<label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+						<label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
 							Nom complet
 						</label>
 						<div className="relative">
 							<User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
 							<input
-								id="name"
-								name="name"
+								id="username"
+								name="username"
 								type="text"
 								required
-								value={formData.name}
+								value={formData.username}
 								onChange={handleChange}
 								className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 								placeholder="John Doe"
@@ -132,7 +161,15 @@ export function ProfileForm() {
 						</div>
 					</div>
 
-					<div className="flex justify-end">
+					<div className="flex justify-between items-center">
+						<button
+							type="button"
+							onClick={handleDeleteAccount}
+							className="text-sm text-red-500 hover:text-red-700 hover:underline transition-colors"
+						>
+							Supprimer mon compte
+						</button>
+
 						<button
 							type="submit"
 							disabled={loading}
@@ -146,6 +183,7 @@ export function ProfileForm() {
 							<span>{loading ? 'Sauvegarde...' : 'Sauvegarder'}</span>
 						</button>
 					</div>
+
 				</form>
 
 				<div className="mt-8 pt-6 border-t border-gray-200">

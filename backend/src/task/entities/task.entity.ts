@@ -21,6 +21,9 @@ export class Task {
   @Column({ default: false })
   isCompleted: boolean;
 
+  @Column({ type: 'enum', enum: ['low', 'medium', 'high'], default: 'medium' })
+  priority: 'low' | 'medium' | 'high';
+
   @Column({ type: 'timestamp', nullable: true })
   dueDate: Date;
 

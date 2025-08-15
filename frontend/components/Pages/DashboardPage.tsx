@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Plus, Loader2, Search } from 'lucide-react';
 import {TodoList} from "@/utils/types";
-import {useAuth} from "@/contexts/AuthContext";
 import {useTodoLists} from "@/hooks/useTodoLists";
-import {taskApi} from "@/utils/mockApi";
 import {TodoListCard} from "@/components/TodoLists/TodoListCard";
 import {TodoListForm} from "@/components/TodoLists/TodoListForm";
 import {useRouter} from "next/navigation";
@@ -15,33 +13,7 @@ export function DashboardPage() {
 	const [showForm, setShowForm] = useState(false);
 	const [editingList, setEditingList] = useState<TodoList | null>(null);
 	const [formLoading, setFormLoading] = useState(false);
-	const [taskCounts, setTaskCounts] = useState<Record<string, { total: number; completed: number }>>({});
 	const [searchTerm, setSearchTerm] = useState('');
-
-	// Load task counts for each list
-	useEffect(() => {
-		const loadTaskCounts = async () => {
-			const counts: Record<string, { total: number; completed: number }> = {};
-
-			for (const list of todoLists) {
-				try {
-					const tasks = await taskApi.getTasks(list.id);
-					counts[list.id] = {
-						total: tasks.length,
-						completed: tasks.filter(task => task.completed).length
-					};
-				} catch (error) {
-					counts[list.id] = { total: 0, completed: 0 };
-				}
-			}
-
-			setTaskCounts(counts);
-		};
-
-		if (todoLists.length > 0) {
-			loadTaskCounts();
-		}
-	}, [todoLists]);
 
 	const filteredLists = todoLists.filter(list =>
 		list.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -50,7 +22,6 @@ export function DashboardPage() {
 
 	const handleSaveList = async (data: Omit<TodoList, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
 		setFormLoading(true);
-        console.log('Saving list:', data, 'Editing:', editingList);
 		try {
 			if (editingList) {
 				await updateTodoList(editingList.id, data);
@@ -164,8 +135,8 @@ export function DashboardPage() {
 						<TodoListCard
 							key={list.id}
 							todoList={list}
-							taskCount={taskCounts[list.id]?.total || 0}
-							completedCount={taskCounts[list.id]?.completed || 0}
+							taskCount={list.tasksCount || 0}
+							completedCount={list.completedTasksCount || 0}
 							onEdit={handleEditList}
 							onDelete={handleDeleteList}
 							onSelect={() => router.push(`/listes/${list.id}`)}

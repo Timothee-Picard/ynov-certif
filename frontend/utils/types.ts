@@ -12,6 +12,8 @@ export interface TodoList {
     name: string;
 	description?: string;
 	color: string;
+	tasksCount: number;
+	completedTasksCount: number;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -21,11 +23,10 @@ export interface Task {
 	listId: string;
 	title: string;
 	description?: string;
-	completed: boolean;
 	priority: 'low' | 'medium' | 'high';
-	dueDate?: string;
+	isCompleted?: boolean;
 	createdAt: string;
-	updatedAt: string;
+	dueDate?: string;
 }
 
 export interface AuthToken {

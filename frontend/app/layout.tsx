@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <html lang="fr">
         <body>
         <AuthProvider>
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 text-gray-900">
                 <Header />
                 <main>{children}</main>
             </div>

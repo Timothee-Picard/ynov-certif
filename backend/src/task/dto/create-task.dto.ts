@@ -14,6 +14,14 @@ export class CreateTaskDto {
   @IsString()
   description?: string;
 
+    @ApiPropertyOptional({
+        example: 'medium',
+        description: 'Priorité de la tâche (low, medium, high)',
+    })
+    @IsOptional()
+    @IsString()
+    priority?: 'low' | 'medium' | 'high' = 'medium';
+
   @ApiPropertyOptional({ example: false, description: 'Statut de la tâche' })
   @IsOptional()
   @IsBoolean()
@@ -26,8 +34,4 @@ export class CreateTaskDto {
   @IsOptional()
   @IsDateString()
   dueDate?: string;
-
-  @ApiProperty({ example: 1, description: 'ID de la liste associée' })
-  @IsString()
-  listId: string;
 }

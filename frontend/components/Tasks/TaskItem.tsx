@@ -25,8 +25,8 @@ export function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemP
 	const [isToggling, setIsToggling] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	const PriorityIcon = priorityIcons[task.priority];
-	const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && !task.completed;
+	const PriorityIcon = priorityIcons[task.priority] || AlertCircle;
+	const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && !task.isCompleted;
 
 	const handleToggleComplete = async () => {
 		setIsToggling(true);
@@ -48,32 +48,32 @@ export function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemP
 
 	return (
 		<div className={`bg-white border border-gray-200 rounded-lg p-4 transition-all duration-200 hover:shadow-md group ${
-			task.completed ? 'opacity-75' : ''
+			task.isCompleted ? 'opacity-75' : ''
 		}`}>
 			<div className="flex items-start space-x-3">
 				<button
 					onClick={handleToggleComplete}
 					disabled={isToggling}
 					className={`flex-shrink-0 w-5 h-5 rounded border-2 transition-all ${
-						task.completed
+						task.isCompleted
 							? 'bg-green-500 border-green-500 text-white'
 							: 'border-gray-300 hover:border-green-500 hover:bg-green-50'
 					} ${isToggling ? 'opacity-50' : ''}`}
 				>
-					{task.completed && <Check className="w-3 h-3 m-0.5" />}
+					{task.isCompleted && <Check className="w-3 h-3 m-0.5" />}
 				</button>
 
 				<div className="flex-1 min-w-0">
 					<div className="flex items-start justify-between">
 						<div className="flex-1">
 							<h4 className={`text-sm font-medium ${
-								task.completed ? 'line-through text-gray-500' : 'text-gray-900'
+								task.isCompleted ? 'line-through text-gray-500' : 'text-gray-900'
 							}`}>
 								{task.title}
 							</h4>
 							{task.description && (
 								<p className={`text-sm mt-1 ${
-									task.completed ? 'line-through text-gray-400' : 'text-gray-600'
+									task.isCompleted ? 'line-through text-gray-400' : 'text-gray-600'
 								}`}>
 									{task.description}
 								</p>
@@ -117,7 +117,7 @@ export function TaskItem({ task, onToggleComplete, onEdit, onDelete }: TaskItemP
 						)}
 
 						<div className="text-xs text-gray-400">
-							{new Date(task.updatedAt).toLocaleDateString('fr-FR')}
+							{/*{new Date(task.updatedAt).toLocaleDateString('fr-FR')}*/}
 						</div>
 					</div>
 				</div>

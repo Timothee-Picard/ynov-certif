@@ -2,16 +2,23 @@
 import { User, LogOut, Settings, CheckSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter, usePathname } from "next/navigation";
+import {useEffect, useState} from "react";
 
 export function Header() {
 	const { user, logout } = useAuth();
 
+	const [displayUser, setDisplayUser] = useState(user);
+
 	const router = useRouter();
 	const pathname = usePathname();
 
+	useEffect(() => {
+		setDisplayUser(user);
+	}, [user]);
+
+
 	function handleLogout() {
 		logout();
-		router.push('/');
 	}
 
 	return (
@@ -51,16 +58,16 @@ export function Header() {
 
 					<div className="flex items-center space-x-4">
 						<div className="flex items-center space-x-2">
-							{user?.avatar ? (
+							{displayUser?.avatar ? (
 								<img
-									src={user.avatar}
-									alt={user.name}
+									src={displayUser.avatar}
+									alt={displayUser.username}
 									className="h-8 w-8 rounded-full object-cover"
 								/>
 							) : (
 								<User className="h-8 w-8 text-gray-400" />
 							)}
-							<span className="text-sm font-medium text-gray-700">{user?.name}</span>
+							<span className="text-sm font-medium text-gray-700">{displayUser?.username}</span>
 						</div>
 						<button
 							onClick={() => handleLogout()}

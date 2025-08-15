@@ -23,7 +23,7 @@ export const authApi = {
         return res.json();
     },
 
-    async validateToken(token: string): Promise<User | null> {
+    async validateToken(token: string): Promise<AuthToken | null> {
         const res = await fetch(`${API_URL}/auth/validate`, {
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -118,7 +118,7 @@ export const todoListApi = {
 
 export const taskApi = {
     async getTasks(listId: string): Promise<Task[]> {
-        const res = await fetch(`${API_URL}/list/${listId}/tasks`, {
+        const res = await fetch(`${API_URL}/task/list/${listId}`, {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (!res.ok) throw new Error(await res.text());
@@ -126,13 +126,13 @@ export const taskApi = {
     },
 
     async createTask(listId: string, data: Omit<Task, "id" | "listId" | "createdAt" | "updatedAt">): Promise<Task> {
-        const res = await fetch(`${API_URL}/task`, {
+        const res = await fetch(`${API_URL}/task/${listId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-            body: JSON.stringify({ ...data, listId }),
+            body: JSON.stringify(data),
         });
         if (!res.ok) throw new Error(await res.text());
         return res.json();

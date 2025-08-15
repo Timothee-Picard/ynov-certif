@@ -36,9 +36,14 @@ export class ListService {
       where: {
         user: { id: userId },
       },
+      relations: ['tasks'],
     });
 
-    return lists;
+    return lists.map(({ tasks, ...list }) => ({
+      ...list,
+      tasksCount: tasks.length,
+      completedTasksCount: tasks.filter(task => task.isCompleted).length,
+    }));
   }
 
   async findOneByUser(userId: string, listId: string) {
@@ -47,7 +52,6 @@ export class ListService {
         id: listId,
         user: { id: userId },
       },
-      relations: ['tasks'],
     });
 
     if (!list) {
