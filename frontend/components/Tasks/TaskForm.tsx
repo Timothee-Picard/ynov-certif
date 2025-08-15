@@ -13,7 +13,7 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 	const [formData, setFormData] = useState({
 		title: '',
 		description: '',
-		completed: false,
+		isCompleted: false,
 		priority: 'medium' as 'low' | 'medium' | 'high',
 		dueDate: ''
 	});
@@ -23,7 +23,7 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 			setFormData({
 				title: task.title,
 				description: task.description || '',
-				completed: task.completed,
+				isCompleted: task.isCompleted || false,
 				priority: task.priority,
 				dueDate: task.dueDate ? task.dueDate.split('T')[0] : ''
 			});
@@ -31,7 +31,7 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 			setFormData({
 				title: '',
 				description: '',
-				completed: false,
+				isCompleted: false,
 				priority: 'medium',
 				dueDate: ''
 			});
@@ -139,14 +139,14 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 						{task && (
 							<div className="flex items-center">
 								<input
-									id="completed"
-									name="completed"
+									id="isCompleted"
+									name="isCompleted"
 									type="checkbox"
-									checked={formData.completed}
+									checked={formData.isCompleted}
 									onChange={handleChange}
 									className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
 								/>
-								<label htmlFor="completed" className="ml-2 text-sm text-gray-700">
+								<label htmlFor="isCompleted" className="ml-2 text-sm text-gray-700">
 									Tâche terminée
 								</label>
 							</div>

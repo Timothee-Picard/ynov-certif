@@ -21,9 +21,9 @@ export class TaskService {
     private readonly listRepository: Repository<List>,
   ) {}
 
-  async create(userId: string, createTaskDto: CreateTaskDto) {
+  async create(userId: string, listId: string, createTaskDto: CreateTaskDto) {
     const list = await this.listRepository.findOne({
-      where: { id: createTaskDto.listId },
+      where: { id: listId },
       relations: ['user'],
     });
     if (!list) throw new NotFoundException('List not found');
@@ -33,6 +33,7 @@ export class TaskService {
     const task = this.taskRepository.create({
       title: createTaskDto.title,
       description: createTaskDto.description,
+      priority: createTaskDto.priority || 'medium',
       isCompleted: createTaskDto.isCompleted ?? false,
       dueDate: createTaskDto.dueDate ? new Date(createTaskDto.dueDate) : null,
       list,
@@ -41,19 +42,41 @@ export class TaskService {
     return this.taskRepository.save(task);
   }
 
-  async findOne(id: string) {
-    const task = await this.taskRepository.findOne({
-      where: { id },
-      relations: ['list'],
+  async findAllByListId(userId: string, listId: string) {
+    const tasks = await this.taskRepository.find({
+      where: {
+        list: { id: listId, user: { id: userId } },
+      },
+      order: {
+        dueDate: 'ASC',
+      },
+      select: [
+        'id',
+        'title',
+        'description',
+        'priority',
+        'isCompleted',
+        'dueDate',
+        'createdAt',
+      ],
     });
-    if (!task) throw new NotFoundException('Task not found');
-    return task;
+
+    return tasks;
   }
 
   async update(userId: string, taskId: string, updateTaskDto: UpdateTaskDto) {
     const task = await this.taskRepository.findOne({
       where: { id: taskId },
       relations: ['list', 'list.user'],
+      select: [
+        'id',
+        'title',
+        'description',
+        'priority',
+        'isCompleted',
+        'dueDate',
+        'createdAt',
+      ],
     });
     if (!task) throw new NotFoundException('Task not found');
 
@@ -63,28 +86,56 @@ export class TaskService {
       );
     }
 
-    if (updateTaskDto.listId) {
-      const newList = await this.listRepository.findOne({
-        where: { id: updateTaskDto.listId },
-        relations: ['user'],
-      });
-      if (!newList) throw new NotFoundException('List not found');
-      if (newList.user.id !== userId) {
-        throw new ForbiddenException(
-          'Vous ne pouvez pas déplacer la tâche vers une liste qui ne vous appartient pas',
-        );
-      }
-      task.list = newList;
+    if (updateTaskDto.title !== undefined) {
+      task.title = updateTaskDto.title;
     }
-
-    Object.assign(task, updateTaskDto);
+    if (updateTaskDto.description !== undefined) {
+      task.description = updateTaskDto.description;
+    }
+    if (updateTaskDto.priority !== undefined) {
+        task.priority = updateTaskDto.priority;
+    }
+    if (updateTaskDto.isCompleted !== undefined) {
+      task.isCompleted = updateTaskDto.isCompleted;
+    }
+    if (updateTaskDto.dueDate !== undefined) {
+      task.dueDate = new Date(updateTaskDto.dueDate);
+    }
     return this.taskRepository.save(task);
   }
+
+  async toggleComplete(userId: string, taskId: string) {
+    const task = await this.taskRepository.findOne({
+      where: { id: taskId },
+      relations: ['list', 'list.user'],
+      select: [
+        'id',
+        'title',
+        'description',
+        'priority',
+        'isCompleted',
+        'dueDate',
+        'createdAt',
+      ],
+    });
+
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    if (task.list.user.id !== userId) {
+      throw new ForbiddenException("Vous n'avez pas la permission de modifier cette tâche");
+    }
+
+    task.isCompleted = !task.isCompleted;
+    return this.taskRepository.save(task);
+  }
+
 
   async remove(userId: string, taskId: string) {
     const task = await this.taskRepository.findOne({
       where: { id: taskId },
-      relations: ['list'],
+      relations: ['list', 'list.user']
     });
 
     if (!task) throw new NotFoundException('Task not found');

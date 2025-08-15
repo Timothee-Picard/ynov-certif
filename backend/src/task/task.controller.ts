@@ -5,7 +5,7 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
+  UseGuards, Get,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -29,36 +29,36 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post(':listeId')
   @ApiOperation({ summary: 'Créer une nouvelle tâche' })
-  @ApiResponse({
-    status: 201,
-    description: 'La tâche a été créée avec succès.',
+  @ApiParam({ name: 'listeId', type: String, description: 'ID de la liste' })
+  @ApiBody({ type: CreateTaskDto })
+  @ApiResponse({ status: 201, description: 'La tâche a été créée avec succès.' })
+  @ApiResponse({ status: 404, description: 'Liste non trouvée.' })
+  @ApiResponse({ status: 403, description: 'Accès interdit. La liste ne vous appartient pas.'
   })
-  @ApiBody({
-    description: 'Données pour créer une tâche',
-    type: CreateTaskDto,
-    examples: {
-      default: {
-        summary: 'Exemple de tâche',
-        value: {
-          title: 'Acheter du lait',
-          description: 'Acheter du lait avant 18h',
-          isCompleted: false,
-          dueDate: '2025-08-15T18:00:00Z',
-          listId: '1',
-        },
-      },
-    },
-  })
-  create(@GetUser() user: User, @Body() createTaskDto: CreateTaskDto) {
-    return this.taskService.create(user.id, createTaskDto);
+  create(@GetUser() user: User, @Param('listeId') listeId: string, @Body() createTaskDto: CreateTaskDto) {
+    return this.taskService.create(user.id, listeId, createTaskDto);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('list/:listeId')
+  @ApiOperation({ summary: 'Récupérer la liste d\'une tâche par l\'ID de sa liste' })
+  @ApiParam({ name: 'listeId', type: String, description: 'ID de la liste' })
+  @ApiResponse({ status: 200, description: 'La tâche a été récupérée avec succès.' })
+  @ApiResponse({ status: 404, description: 'Tâche non trouvée.' })
+  findAllByListId(
+    @GetUser() user: User,
+    @Param('listeId') listeId: string,
+    ) {
+    return this.taskService.findAllByListId(user.id, listeId);
+  }
+
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Mettre à jour une tâche par son ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'ID de la tâche' })
+  @ApiParam({ name: 'id', type: String, description: 'ID de la tâche' })
   @ApiResponse({ status: 200, description: 'La tâche a été mise à jour.' })
   @ApiResponse({ status: 404, description: 'Tâche non trouvée.' })
   update(
@@ -70,9 +70,23 @@ export class TaskController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Patch(':id/toggle')
+  @ApiOperation({ summary: 'Inverser le statut de complétion d’une tâche' })
+  @ApiParam({ name: 'id', type: String, description: 'ID de la tâche' })
+  @ApiResponse({ status: 200, description: 'Statut de la tâche inversé.' })
+  @ApiResponse({ status: 404, description: 'Tâche non trouvée.' })
+  toggle(
+      @GetUser() user: User,
+      @Param('id') id: string,
+  ) {
+    return this.taskService.toggleComplete(user.id, id);
+  }
+
+
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Supprimer une tâche par son ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'ID de la tâche' })
+  @ApiParam({ name: 'id', type: String, description: 'ID de la tâche' })
   @ApiResponse({ status: 200, description: 'La tâche a été supprimée.' })
   @ApiResponse({ status: 404, description: 'Tâche non trouvée.' })
   remove(@GetUser() user: User, @Param('id') id: string) {

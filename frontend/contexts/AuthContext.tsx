@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { User, LoginCredentials, RegisterCredentials } from '@/utils/types';
 import { authApi } from '@/utils/mockApi';
 import { authStorage } from '@/utils/auth';
+import {useRouter} from "next/navigation";
 
 interface AuthContextType {
 	user: User | null;
@@ -23,6 +24,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const [user, setUser] = useState<User | null>(null);
 	const [loading, setLoading] = useState(true);
 
+	const router = useRouter();
+
 	useEffect(() => {
 		const initAuth = async () => {
 			const tokenData = authStorage.getTokenData();
@@ -30,7 +33,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 				try {
 					const validUser = await authApi.validateToken(tokenData.token);
 					if (validUser) {
-						setUser(validUser);
+						setUser(validUser.user);
 					} else {
 						authStorage.removeToken();
 					}
@@ -71,6 +74,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const logout = () => {
 		authStorage.removeToken();
 		setUser(null);
+		router.push('/');
 	};
 
 	const updateUser = (updatedUser: User) => {

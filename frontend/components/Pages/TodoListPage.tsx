@@ -19,7 +19,6 @@ export function TodoListPage({ id }: TodoListPageProps) {
 	const { todoList, loading: listLoading, error: listError } = useTodoList(id);
 	const { tasks, loading: tasksLoading, error: tasksError, createTask, updateTask, deleteTask, toggleTaskComplete } = useTasks(id);
 
-
 	const router = useRouter();
 	const [showForm, setShowForm] = useState(false);
 	const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -28,9 +27,18 @@ export function TodoListPage({ id }: TodoListPageProps) {
 	const [filter, setFilter] = useState<FilterType>('all');
 
 	const filteredTasks = tasks
+		.slice()
+		.sort((a, b) => {
+			if (a.isCompleted !== b.isCompleted) {
+				return a.isCompleted ? 1 : -1;
+			}
+			const dateA = a.dueDate ? new Date(a.dueDate).getTime() : new Date(a.createdAt).getTime();
+			const dateB = b.dueDate ? new Date(b.dueDate).getTime() : new Date(b.createdAt).getTime();
+			return dateA - dateB;
+		})
 		.filter(task => {
-			if (filter === 'pending') return !task.completed;
-			if (filter === 'completed') return task.completed;
+			if (filter === 'pending') return !task.isCompleted;
+			if (filter === 'completed') return task.isCompleted;
 			return true;
 		})
 		.filter(task =>
@@ -38,7 +46,9 @@ export function TodoListPage({ id }: TodoListPageProps) {
 			(task.description && task.description.toLowerCase().includes(searchTerm.toLowerCase()))
 		);
 
-	const completedCount = tasks.filter(task => task.completed).length;
+
+
+	const completedCount = tasks.filter(task => task.isCompleted).length;
 	const progress = tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0;
 
 	const handleSaveTask = async (data: Omit<Task, 'id' | 'listId' | 'createdAt' | 'updatedAt'>) => {

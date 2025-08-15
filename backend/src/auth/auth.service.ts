@@ -39,7 +39,7 @@ export class AuthService {
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
-    const token = this.jwtService.sign({ id: user.id, email: user.email });
+    const token = this.jwtService.sign({ id: user.id, email: user.email, avatar: user.avatar });
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
     return {
@@ -48,7 +48,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        name: user.username, // correspond au "name" du front
+        username: user.username,
         avatar: user.avatar || undefined,
         createdAt: user.createdAt.toISOString(),
       },
@@ -76,6 +76,7 @@ export class AuthService {
     const token = this.jwtService.sign({
       id: savedUser.id,
       email: savedUser.email,
+      avatar: savedUser.avatar,
     });
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
@@ -85,7 +86,7 @@ export class AuthService {
       user: {
         id: savedUser.id,
         email: savedUser.email,
-        name: savedUser.username,
+        username: savedUser.username,
         avatar: savedUser.avatar || undefined,
         createdAt: savedUser.createdAt.toISOString(),
       },
@@ -100,7 +101,11 @@ export class AuthService {
 
       if (!user) return null;
 
-      const token = this.jwtService.sign({ sub: user.id });
+      const token = this.jwtService.sign({
+        id: user.id,
+        email: user.email,
+        avatar: user.avatar
+      });
 
       return {
         token,
@@ -108,7 +113,7 @@ export class AuthService {
         user: {
           id: user.id,
           email: user.email,
-          name: user.username,
+          username: user.username,
           avatar: user.avatar || undefined,
           createdAt: user.createdAt.toISOString(),
         },
