@@ -12,8 +12,8 @@ export interface TodoList {
     name: string;
 	description?: string;
 	color: string;
-	tasksCount: number;
-	completedTasksCount: number;
+	tasksCount?: number;
+	completedTasksCount?: number;
 	createdAt: string;
 	updatedAt: string;
 }

@@ -3,6 +3,7 @@ import {ChangeEvent, FormEvent, useEffect, useState} from 'react';
 import { User, Mail, Save, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { userApi } from '@/utils/mockApi';
+import Image from "next/image";
 
 export function ProfileForm() {
 	const { user, updateUser, logout } = useAuth();
@@ -96,7 +97,7 @@ export function ProfileForm() {
 					<div className="flex items-center space-x-6">
 						<div className="shrink-0">
 							{formData.avatar ? (
-								<img
+								<Image
 									src={formData.avatar}
 									alt="Avatar"
 									className="h-20 w-20 rounded-full object-cover border-4 border-gray-200"
@@ -109,7 +110,7 @@ export function ProfileForm() {
 						</div>
 						<div className="flex-1">
 							<label htmlFor="avatar" className="block text-sm font-medium text-gray-700 mb-2">
-								URL de l'avatar
+								URL de l&apos;avatar
 							</label>
 							<input
 								id="avatar"

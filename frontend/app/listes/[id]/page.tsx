@@ -1,14 +1,7 @@
-import {use} from "react";
-import {TodoListPage} from "@/components/Pages/TodoListPage";
+import { TodoListPage } from '@/components/Pages/TodoListPage'
 
-interface ListPageProps {
-	params: { id: string };
-}
+export default async function ListPage({ params }: { params: Promise<{ id: string }> }) {
+	const { id } = await params
 
-export default function ListPage({ params }: ListPageProps) {
-	const { id } = use<{ id: string }>(Promise.resolve(params));
-
-	return (
-		<TodoListPage id={id} />
-  );
+	return <TodoListPage id={id} />
 }
