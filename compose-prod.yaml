@@ -10,6 +10,8 @@ services:
         condition: service_healthy
     ports:
       - "3001:3000"
+    volumes:
+      - /app/node_modules
     networks:
       - default
     healthcheck:
@@ -31,6 +33,8 @@ services:
         condition: service_healthy
     ports:
       - "3002:3000"
+    volumes:
+      - /app/node_modules
     environment:
       - DB_TYPE=postgres
       - DB_HOST=database
