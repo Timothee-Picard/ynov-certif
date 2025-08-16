@@ -24,9 +24,9 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: ${APP_ENV}
+      target: prod
       args:
-        BUILD_ENV: ${APP_ENV}
+        BUILD_ENV: prod
     restart: unless-stopped
     depends_on:
       database:
