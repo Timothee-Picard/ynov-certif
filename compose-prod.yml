@@ -8,6 +8,11 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "http://frontend:3000/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   backend:
     build:
@@ -28,6 +33,11 @@ services:
       - DB_USERNAME=${DATABASE_USERNAME}
       - DB_PASSWORD=${DATABASE_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "http://backend:3000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   database:
     image: bitnami/postgresql:latest
@@ -37,3 +47,8 @@ services:
       - POSTGRESQL_PASSWORD=${DATABASE_PASSWORD}
       - POSTGRESQL_DATABASE=${DATABASE_NAME}
       - POSTGRESQL_PORT_NUMBER=6432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -p 6432" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
