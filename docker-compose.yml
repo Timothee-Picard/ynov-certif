@@ -8,6 +8,8 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     ports:
       - "3001:3000"
     volumes:

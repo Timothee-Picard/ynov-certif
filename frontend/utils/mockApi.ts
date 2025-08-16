@@ -1,6 +1,6 @@
 import {AuthToken, LoginCredentials, RegisterCredentials, Task, TodoList, User} from "@/utils/types";
 
-const API_URL = "http://localhost:3002";
+const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 export const authApi = {
     async login(credentials: LoginCredentials): Promise<AuthToken> {
