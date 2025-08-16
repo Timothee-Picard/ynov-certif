@@ -5,7 +5,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
 export const authApi = {
     async login(credentials: LoginCredentials): Promise<AuthToken> {
         console.log(API_URL)
-        const res = await fetch(`${API_URL}/auth/login`, {
+        const res = await fetch(`${API_URL}auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(credentials),
