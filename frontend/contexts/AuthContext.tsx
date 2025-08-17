@@ -1,7 +1,7 @@
 'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginCredentials, RegisterCredentials } from '@/utils/types';
-import { authApi } from '@/utils/mockApi';
+import { authApi } from '@/utils/Api';
 import { authStorage } from '@/utils/auth';
 import {useRouter} from "next/navigation";
 

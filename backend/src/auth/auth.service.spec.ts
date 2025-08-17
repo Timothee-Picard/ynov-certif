@@ -18,7 +18,6 @@ function createMockRepo<T>(): MockRepo<T> {
 	};
 }
 
-// Mocks explicites
 jest.mock('bcrypt', () => ({
 	compare: jest.fn(),
 	hash: jest.fn(),
@@ -29,7 +28,6 @@ describe('AuthService', () => {
 	let userRepo: MockRepo<User>;
 	let jwtService: { sign: jest.Mock };
 
-	// Figer le temps pour des expiresAt déterministes
 	const FIXED_NOW = new Date('2025-08-17T12:00:00.000Z').getTime();
 
 	beforeAll(() => {
@@ -56,7 +54,6 @@ describe('AuthService', () => {
 		jest.clearAllMocks();
 	});
 
-	// -------- login --------
 	it('login() retourne le token et les infos user si credentials OK', async () => {
 		const credentials = { email: 'john@doe.tld', password: 'plain' };
 		const createdAt = new Date('2025-08-01T10:00:00.000Z');
@@ -78,7 +75,6 @@ describe('AuthService', () => {
 		expect(bcrypt.compare).toHaveBeenCalledWith('plain', 'hashed');
 		expect(jwtService.sign).toHaveBeenCalledWith({ id: 'u1', email: credentials.email, avatar: null });
 
-		// expiresAt = now + 24h
 		expect(result.expiresAt).toBe(new Date(FIXED_NOW + 24 * 60 * 60 * 1000).toISOString());
 		expect(result).toEqual({
 			token: 'signed.jwt.token',
@@ -87,7 +83,7 @@ describe('AuthService', () => {
 				id: 'u1',
 				email: 'john@doe.tld',
 				username: 'John',
-				avatar: undefined, // null devient undefined selon le service
+				avatar: undefined,
 				createdAt: createdAt.toISOString(),
 			},
 		});
@@ -114,17 +110,16 @@ describe('AuthService', () => {
 			.rejects.toBeInstanceOf(UnauthorizedException);
 	});
 
-	// -------- register --------
 	it('register() crée l’utilisateur (hash pw) puis retourne le token et le user', async () => {
 		const data = { username: 'Jane', email: 'jane@doe.tld', password: 'plain' };
 
-		userRepo.findOne!.mockResolvedValue(null); // pas d’utilisateur existant
+		userRepo.findOne!.mockResolvedValue(null);
 		(bcrypt.hash as jest.Mock).mockResolvedValue('hashedpw');
 
 		const createdAt = new Date('2025-08-02T09:00:00.000Z');
 
-		userRepo.create!.mockImplementation((arg) => ({ ...arg, id: undefined, createdAt })); // simul create()
-		userRepo.save!.mockImplementation(async (arg) => ({ ...arg, id: 'u2', createdAt })); // simul save()
+		userRepo.create!.mockImplementation((arg) => ({ ...arg, id: undefined, createdAt }));
+		userRepo.save!.mockImplementation(async (arg) => ({ ...arg, id: 'u2', createdAt }));
 
 		const result = await service.register(data);
 
@@ -165,7 +160,6 @@ describe('AuthService', () => {
 		})).rejects.toBeInstanceOf(BadRequestException);
 	});
 
-	// -------- validateToken --------
 	it('validateToken() retourne token + user si user trouvé', async () => {
 		const createdAt = new Date('2025-08-05T08:00:00.000Z');
 
@@ -187,7 +181,7 @@ describe('AuthService', () => {
 		});
 		expect(result).toEqual({
 			token: 'signed.jwt.token',
-			expiresAt: new Date(FIXED_NOW + 3600 * 1000).toISOString(), // +1h
+			expiresAt: new Date(FIXED_NOW + 3600 * 1000).toISOString(),
 			user: {
 				id: 'u1',
 				email: 'a@b.c',

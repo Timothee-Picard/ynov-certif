@@ -7,7 +7,6 @@ import { LoginCredentialsDto } from './dto/login-credentials.dto';
 import { RegisterCredentialsDto } from './dto/register-credentials.dto';
 import { User } from '../utils/types';
 
-// --- Mock du service ---
 const authServiceMock = {
 	login: jest.fn(),
 	register: jest.fn(),
@@ -35,20 +34,17 @@ describe('AuthController', () => {
 		controller = module.get<AuthController>(AuthController);
 	});
 
-	// Helper pour lire les guards appliqués sur une méthode
 	function getMethodGuards(proto: any, methodName: string) {
 		const guards =
 			Reflect.getMetadata('__guards__', proto[methodName]) ?? [];
 		return guards.map((g: any) => (typeof g === 'function' ? g : g?.canActivate));
 	}
 
-	// --- Présence des guards ---
 	it('validateToken() est protégé par JwtAuthGuard', () => {
 		const guards = getMethodGuards(AuthController.prototype, 'validateToken');
 		expect(guards).toContain(JwtAuthGuard);
 	});
 
-	// --- Tests fonctionnels ---
 	it('login() appelle authService.login avec les credentials et retourne le token', async () => {
 		const creds: LoginCredentialsDto = { email: 'a@b.c', password: 'pw' };
 		authServiceMock.login.mockResolvedValue(token);

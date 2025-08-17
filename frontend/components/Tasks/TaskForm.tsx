@@ -1,4 +1,5 @@
-import {useState, useEffect, FormEvent, ChangeEvent} from 'react';
+'use client';
+import {useState, useEffect, FormEvent, ChangeEvent, KeyboardEvent} from 'react';
 import { X, Save, Loader2 } from 'lucide-react';
 import { Task } from '@/utils/types';
 
@@ -15,7 +16,7 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 		description: '',
 		isCompleted: false,
 		priority: 'medium' as 'low' | 'medium' | 'high',
-		dueDate: ''
+		dueDate: '',
 	});
 
 	useEffect(() => {
@@ -25,7 +26,7 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 				description: task.description || '',
 				isCompleted: task.isCompleted || false,
 				priority: task.priority,
-				dueDate: task.dueDate ? task.dueDate.split('T')[0] : ''
+				dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
 			});
 		} else {
 			setFormData({
@@ -33,7 +34,7 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 				description: '',
 				isCompleted: false,
 				priority: 'medium',
-				dueDate: ''
+				dueDate: '',
 			});
 		}
 	}, [task]);
@@ -42,49 +43,94 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 		e.preventDefault();
 		const submitData = {
 			...formData,
-			dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : undefined
+			dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : undefined,
 		};
 		await onSave(submitData);
 	};
 
-	const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+	const handleChange = (
+		e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+	) => {
 		const { name, value, type } = e.target;
 		setFormData(prev => ({
 			...prev,
-			[name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+			[name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
 		}));
 	};
 
+	const onOverlayKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+		if (e.key === 'Escape') onCancel();
+	};
+
+	const titleId = 'taskform-title';
+	const descId = 'taskform-desc';
+
 	return (
-		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-			<div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+		<div
+			className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+			onKeyDown={onOverlayKeyDown}
+			data-testid="taskform-overlay"
+		>
+			<div
+				className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby={titleId}
+				aria-describedby={descId}
+				data-testid="taskform-dialog"
+			>
 				<div className="p-6">
 					<div className="flex items-center justify-between mb-6">
-						<h2 className="text-xl font-semibold text-gray-900">
-							{task ? 'Modifier la tâche' : 'Nouvelle tâche'}
-						</h2>
+						<div>
+							<h2
+								id={titleId}
+								className="text-xl font-semibold text-gray-900"
+								data-testid="taskform-title"
+							>
+								{task ? 'Modifier la tâche' : 'Nouvelle tâche'}
+							</h2>
+							<p id={descId} className="sr-only">
+								Formulaire de {task ? 'modification' : 'création'} d’une tâche
+							</p>
+							<span className="sr-only" data-testid="task-form-mode">
+                {task ? 'editing' : 'creating'}
+              </span>
+						</div>
+
 						<button
+							type="button"
 							onClick={onCancel}
 							className="text-gray-400 hover:text-gray-600 transition-colors"
+							aria-label="Fermer le formulaire"
+							data-testid="taskform-close"
 						>
-							<X className="h-6 w-6" />
+							<X className="h-6 w-6" aria-hidden="true" />
 						</button>
 					</div>
 
-					<form onSubmit={handleSubmit} className="space-y-6">
+					<form
+						onSubmit={handleSubmit}
+						className="space-y-6"
+						aria-labelledby={titleId}
+						data-testid="taskform-form"
+					>
 						<div>
 							<label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-								Titre *
+								Titre <span aria-hidden="true">*</span>
 							</label>
 							<input
 								id="title"
 								name="title"
 								type="text"
 								required
+								autoComplete="off"
+								autoFocus
 								value={formData.title}
 								onChange={handleChange}
+								aria-invalid={!formData.title.trim() ? true : undefined}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 								placeholder="Titre de la tâche"
+								data-testid="taskform-title-input"
 							/>
 						</div>
 
@@ -100,6 +146,7 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 								onChange={handleChange}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
 								placeholder="Description optionnelle"
+								data-testid="taskform-description"
 							/>
 						</div>
 
@@ -114,6 +161,7 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 									value={formData.priority}
 									onChange={handleChange}
 									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+									data-testid="taskform-priority"
 								>
 									<option value="low">Basse</option>
 									<option value="medium">Moyenne</option>
@@ -132,6 +180,7 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 									value={formData.dueDate}
 									onChange={handleChange}
 									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+									data-testid="taskform-dueDate"
 								/>
 							</div>
 						</div>
@@ -145,6 +194,7 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 									checked={formData.isCompleted}
 									onChange={handleChange}
 									className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+									data-testid="taskform-isCompleted"
 								/>
 								<label htmlFor="isCompleted" className="ml-2 text-sm text-gray-700">
 									Tâche terminée
@@ -157,18 +207,24 @@ export function TaskForm({ task, onSave, onCancel, loading = false }: TaskFormPr
 								type="button"
 								onClick={onCancel}
 								className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+								aria-label="Annuler"
+								data-testid="taskform-cancel"
 							>
 								Annuler
 							</button>
+
 							<button
 								type="submit"
 								disabled={loading || !formData.title.trim()}
+								aria-label="Sauvegarder la tâche"
+								aria-busy={loading}
 								className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+								data-testid="taskform-submit"
 							>
 								{loading ? (
-									<Loader2 className="h-4 w-4 animate-spin" />
+									<Loader2 className="h-4 w-4 animate-spin" role="status" aria-label="Chargement" data-testid="taskform-spinner" />
 								) : (
-									<Save className="h-4 w-4" />
+									<Save className="h-4 w-4" aria-hidden="true" />
 								)}
 								<span>{loading ? 'Sauvegarde...' : 'Sauvegarder'}</span>
 							</button>

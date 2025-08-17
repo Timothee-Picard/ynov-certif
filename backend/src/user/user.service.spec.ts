@@ -17,7 +17,6 @@ function createMockRepo<T>(): MockRepo<T> {
   };
 }
 
-// Mock global de bcrypt
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),
 }));
@@ -42,7 +41,6 @@ describe('UserService', () => {
     jest.clearAllMocks();
   });
 
-  // ---------- findOne ----------
   it('findOne() retourne l’utilisateur sans le champ password', async () => {
     const entity = {
       id: userId,
@@ -60,7 +58,6 @@ describe('UserService', () => {
       id: userId,
       email: 'test@example.com',
       username: 'John',
-      // password retiré
     });
     expect((result as any).password).toBeUndefined();
   });
@@ -70,7 +67,6 @@ describe('UserService', () => {
     await expect(service.findOne(userId)).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  // ---------- update ----------
   it('update() met à jour sans mot de passe (pas de hash) et sauvegarde', async () => {
     const existing = { id: userId, username: 'Old', email: 'old@a.b', password: 'hash' } as any;
     userRepo.findOne!.mockResolvedValue(existing);
@@ -107,7 +103,6 @@ describe('UserService', () => {
     await expect(service.update(userId, {} as any)).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  // ---------- remove ----------
   it('remove() supprime et renvoie un message', async () => {
     const existing = { id: userId } as any;
     userRepo.findOne!.mockResolvedValue(existing);

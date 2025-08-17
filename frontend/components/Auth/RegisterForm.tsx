@@ -1,4 +1,4 @@
-import {ChangeEvent, FormEvent, useState} from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import { Mail, Lock, User, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -12,7 +12,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 		username: '',
 		email: '',
 		password: '',
-		confirmPassword: ''
+		confirmPassword: '',
 	});
 	const [error, setError] = useState('');
 
@@ -32,43 +32,63 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
 		try {
 			await register({
-                username: formData.username,
+				username: formData.username,
 				email: formData.email,
-				password: formData.password
+				password: formData.password,
 			});
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Erreur lors de l\'inscription');
+			setError(err instanceof Error ? err.message : "Erreur lors de l'inscription");
 		}
 	};
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setFormData(prev => ({
 			...prev,
-			[e.target.name]: e.target.value
+			[e.target.name]: e.target.value,
 		}));
 	};
 
+	const errorId = 'register-error';
+
 	return (
-		<div className="w-full max-w-md mx-auto">
+		<div className="w-full max-w-md mx-auto" data-testid="register-container">
 			<div className="bg-white rounded-lg shadow-lg p-8">
 				<div className="text-center mb-8">
-					<h2 className="text-3xl font-bold text-gray-900">Inscription</h2>
+					<h2 className="text-3xl font-bold text-gray-900" data-testid="register-title">
+						Inscription
+					</h2>
 					<p className="text-gray-600 mt-2">Créez votre compte TodoApp</p>
 				</div>
 
-				<form onSubmit={handleSubmit} className="space-y-6">
+				<form
+					onSubmit={handleSubmit}
+					className="space-y-6"
+					aria-labelledby="register-title"
+					data-testid="register-form"
+				>
 					{error && (
-						<div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+						<div
+							id={errorId}
+							role="alert"
+							aria-live="assertive"
+							aria-atomic="true"
+							className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm"
+							data-testid="register-error"
+						>
 							{error}
 						</div>
 					)}
 
 					<div>
 						<label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-						    Nom d&#39;utilisateur
+							Nom d&apos;utilisateur
 						</label>
 						<div className="relative">
-							<User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+							<User
+								className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+								aria-hidden="true"
+								focusable="false"
+							/>
 							<input
 								id="username"
 								name="username"
@@ -76,8 +96,12 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 								required
 								value={formData.username}
 								onChange={handleChange}
+								autoComplete="username"
+								aria-invalid={!!error && formData.username.trim() === '' ? true : undefined}
+								aria-describedby={error ? errorId : undefined}
 								className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 								placeholder="John Doe"
+								data-testid="register-username"
 							/>
 						</div>
 					</div>
@@ -87,7 +111,11 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 							Email
 						</label>
 						<div className="relative">
-							<Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+							<Mail
+								className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+								aria-hidden="true"
+								focusable="false"
+							/>
 							<input
 								id="email"
 								name="email"
@@ -95,8 +123,12 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 								required
 								value={formData.email}
 								onChange={handleChange}
+								autoComplete="email"
+								aria-invalid={!!error && formData.email.trim() === '' ? true : undefined}
+								aria-describedby={error ? errorId : undefined}
 								className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 								placeholder="votre@email.com"
+								data-testid="register-email"
 							/>
 						</div>
 					</div>
@@ -106,7 +138,11 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 							Mot de passe
 						</label>
 						<div className="relative">
-							<Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+							<Lock
+								className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+								aria-hidden="true"
+								focusable="false"
+							/>
 							<input
 								id="password"
 								name="password"
@@ -114,8 +150,17 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 								required
 								value={formData.password}
 								onChange={handleChange}
+								autoComplete="new-password"
+								aria-invalid={
+									!!error &&
+									(error.includes('caractères') || error.includes('correspondent'))
+										? true
+										: undefined
+								}
+								aria-describedby={error ? errorId : undefined}
 								className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 								placeholder="••••••••"
+								data-testid="register-password"
 							/>
 						</div>
 					</div>
@@ -125,7 +170,11 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 							Confirmer le mot de passe
 						</label>
 						<div className="relative">
-							<Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+							<Lock
+								className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+								aria-hidden="true"
+								focusable="false"
+							/>
 							<input
 								id="confirmPassword"
 								name="confirmPassword"
@@ -133,8 +182,12 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 								required
 								value={formData.confirmPassword}
 								onChange={handleChange}
+								autoComplete="new-password"
+								aria-invalid={!!error && error.includes('correspondent') ? true : undefined}
+								aria-describedby={error ? errorId : undefined}
 								className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 								placeholder="••••••••"
+								data-testid="register-confirm"
 							/>
 						</div>
 					</div>
@@ -142,12 +195,15 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 					<button
 						type="submit"
 						disabled={loading}
+						aria-label="S'inscrire"
+						aria-busy={loading}
 						className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+						data-testid="submit-button"
 					>
 						{loading ? (
-							<Loader2 className="h-5 w-5 animate-spin" />
+							<Loader2 className="h-5 w-5 animate-spin" role="status" aria-label="Chargement" />
 						) : (
-							'S\'inscrire'
+							"S'inscrire"
 						)}
 					</button>
 				</form>
@@ -156,6 +212,8 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 					<button
 						onClick={onSwitchToLogin}
 						className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+						type="button"
+						data-testid="switch-login-button"
 					>
 						Déjà un compte ? Se connecter
 					</button>

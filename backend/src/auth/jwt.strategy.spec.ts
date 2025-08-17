@@ -19,7 +19,6 @@ describe('JwtStrategy', () => {
 	let userRepo: MockRepo<User>;
 
 	beforeEach(async () => {
-		// Optionnel : fixer une clé pour éviter toute dépendance à l'env
 		process.env.JWT_SECRET = 'test_secret_key';
 
 		userRepo = createMockRepo<User>();
