@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Task } from '@/utils/types';
-import { taskApi } from '@/utils/mockApi';
+import { taskApi } from '@/utils/Api';
 
 export function useTasks(listId: string | null) {
 	const [tasks, setTasks] = useState<Task[]>([]);

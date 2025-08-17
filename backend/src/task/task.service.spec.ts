@@ -45,7 +45,6 @@ describe('TaskService', () => {
 
   afterEach(() => jest.clearAllMocks());
 
-  // ---------- create ----------
   it('create() crée une tâche si la liste existe et appartient au user', async () => {
     const createDto = {
       title: 'Acheter du lait',
@@ -102,7 +101,6 @@ describe('TaskService', () => {
         .rejects.toBeInstanceOf(UnauthorizedException);
   });
 
-  // ---------- findAllByListId ----------
   it('findAllByListId() renvoie les tâches triées par dueDate ASC et avec select', async () => {
     const tasks = [
       { id: 't1', dueDate: new Date('2025-01-01') },
@@ -120,7 +118,6 @@ describe('TaskService', () => {
     expect(result).toEqual(tasks);
   });
 
-  // ---------- update ----------
   it('update() met à jour les champs fournis et sauvegarde', async () => {
     const existing = {
       id: taskId,
@@ -175,7 +172,6 @@ describe('TaskService', () => {
         .rejects.toBeInstanceOf(ForbiddenException);
   });
 
-  // ---------- toggleComplete ----------
   it('toggleComplete() inverse isCompleted et sauvegarde', async () => {
     const existing = {
       id: taskId,
@@ -218,7 +214,6 @@ describe('TaskService', () => {
         .rejects.toBeInstanceOf(ForbiddenException);
   });
 
-  // ---------- remove ----------
   it('remove() supprime la tâche et renvoie un message', async () => {
     const existing = { id: taskId, list: { id: listId, user: { id: userId } } } as any;
     taskRepo.findOne!.mockResolvedValue(existing);

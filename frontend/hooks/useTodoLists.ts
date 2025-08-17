@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TodoList } from '@/utils/types';
-import { todoListApi } from '@/utils/mockApi';
+import { todoListApi } from '@/utils/Api';
 
 export function useTodoLists() {
 	const [todoLists, setTodoLists] = useState<TodoList[]>([]);

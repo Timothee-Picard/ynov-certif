@@ -22,7 +22,6 @@ export const authStorage = {
 		try {
 			const tokenData: AuthToken = JSON.parse(data);
 
-			// Check if token is expired
 			if (new Date(tokenData.expiresAt) < new Date()) {
 				this.removeToken();
 				return null;

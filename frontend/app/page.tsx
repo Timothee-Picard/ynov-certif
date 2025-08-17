@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
-import {AuthPage} from "@/components/Pages/authPage";
+import {AuthPage} from "@/components/Pages/AuthPage";
 import {DashboardPage} from "@/components/Pages/DashboardPage";
 
 export default function Home() {
