@@ -28,7 +28,7 @@ describe('ListService', () => {
 
   beforeEach(async () => {
     listRepo = createMockRepo<List>();
-    userRepo = createMockRepo<User>(); // pas utilisé par le service mais injecté
+    userRepo = createMockRepo<User>();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -43,7 +43,6 @@ describe('ListService', () => {
 
   afterEach(() => jest.clearAllMocks());
 
-  // -------- create ----------
   it('create() crée et sauvegarde une liste liée au user', async () => {
     const dto = { name: 'Courses', description: 'Hebdo', color: '#fff' };
     const created = { id: 'list-1', ...dto, user: { id: userId } } as any;
@@ -63,7 +62,6 @@ describe('ListService', () => {
     expect(result).toEqual(created);
   });
 
-  // -------- findAllByUser ----------
   it('findAllByUser() retourne les listes avec tasksCount et completedTasksCount', async () => {
     const lists = [
       { id: 'l1', name: 'A', tasks: [{ isCompleted: false }, { isCompleted: true }] },
@@ -84,7 +82,6 @@ describe('ListService', () => {
     ]);
   });
 
-  // -------- findOneByUser ----------
   it('findOneByUser() retourne la liste si elle appartient au user', async () => {
     const list = { id: 'l1', user: { id: userId } } as any;
     listRepo.findOne!.mockResolvedValue(list);
@@ -104,7 +101,6 @@ describe('ListService', () => {
         .rejects.toBeInstanceOf(NotFoundException);
   });
 
-  // -------- update ----------
   it('update() met à jour les champs fournis et sauvegarde', async () => {
     const existing = {
       id: 'l1',
@@ -130,7 +126,6 @@ describe('ListService', () => {
       ...existing,
       name: 'New',
       color: '#222',
-      // description inchangée
     });
     expect(result.name).toBe('New');
     expect(result.color).toBe('#222');
@@ -151,7 +146,6 @@ describe('ListService', () => {
         .rejects.toBeInstanceOf(ForbiddenException);
   });
 
-  // -------- remove ----------
   it('remove() supprime la liste et retourne un message', async () => {
     const existing = { id: 'l1', user: { id: userId } } as any;
     listRepo.findOne!.mockResolvedValue(existing);

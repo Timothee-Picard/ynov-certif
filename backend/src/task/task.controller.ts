@@ -23,7 +23,7 @@ import { User } from '../utils/types';
 import { GetUser } from '../auth/get-user.decorator';
 
 @ApiBearerAuth()
-@ApiTags('tasks') // Groupe les routes dans Swagger sous "tasks"
+@ApiTags('tasks')
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}

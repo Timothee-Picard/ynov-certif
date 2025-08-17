@@ -1,0 +1,74 @@
+name: frontend-ci
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/ci-frontend.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Debug tree (racine)
+        run: |
+          pwd
+          ls -la
+
+      - name: Localiser le dossier frontend
+        id: locate
+        run: |
+          if [ -d app/frontend ]; then
+            echo "FRONTEND_DIR=app/frontend" >> "$GITHUB_ENV"
+          elif [ -d frontend ]; then
+            echo "FRONTEND_DIR=frontend" >> "$GITHUB_ENV"
+          else
+            echo "::error ::Aucun dossier frontend trouvé (attendu: app/frontend ou frontend)"
+            exit 1
+          fi
+          echo "Chemin retenu: $FRONTEND_DIR"
+
+      - name: Debug tree (frontend)
+        run: |
+          ls -la "$FRONTEND_DIR" || true
+          ls -la "$FRONTEND_DIR"/package*.json || true
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            ${{ env.FRONTEND_DIR }}/package-lock.json
+            ${{ env.FRONTEND_DIR }}/npm-shrinkwrap.json
+
+      - name: Install deps
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Set test env
+        run: |
+          echo "NODE_ENV=test" >> $GITHUB_ENV
+          echo "CI=true" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_API_URL=https://api.example.com" >> $GITHUB_ENV
+          echo "TZ=Europe/Paris" >> $GITHUB_ENV
+
+      - name: Run tests with coverage
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm test -- --coverage
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: ${{ env.FRONTEND_DIR }}/coverage

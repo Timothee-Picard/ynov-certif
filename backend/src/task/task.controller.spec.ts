@@ -7,7 +7,6 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { User } from '../utils/types';
 
-// --- Mock du service ---
 const taskServiceMock = {
   create: jest.fn(),
   findAllByListId: jest.fn(),
@@ -37,16 +36,11 @@ describe('TaskController', () => {
     controller = module.get<TaskController>(TaskController);
   });
 
-  // --- Helpers ---
-
-  // Récupère les guards appliqués sur une méthode (vérifie la présence de JwtAuthGuard)
   function getMethodGuards(controllerProto: any, methodName: string) {
     const guards =
         Reflect.getMetadata('__guards__', controllerProto[methodName]) ?? [];
     return guards.map((g: any) => (typeof g === 'function' ? g : g?.canActivate));
   }
-
-  // --- Présence des guards ---
 
   it('create() doit être protégé par JwtAuthGuard', () => {
     const guards = getMethodGuards(TaskController.prototype, 'create');
@@ -72,8 +66,6 @@ describe('TaskController', () => {
     const guards = getMethodGuards(TaskController.prototype, 'remove');
     expect(guards).toContain(JwtAuthGuard);
   });
-
-  // --- Tests fonctionnels des méthodes ---
 
   it('create() appelle taskService.create avec (user.id, listeId, dto) et retourne le résultat', async () => {
     const listeId = 'list-123';
