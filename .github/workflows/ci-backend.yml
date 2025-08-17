@@ -1,0 +1,72 @@
+name: backend-ci
+
+on:
+  pull_request:
+    branches: [ main, develop]
+    paths:
+      - 'app/backend/**'
+      - '.github/workflows/ci-backend.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Debug tree (racine)
+        run: |
+          pwd
+          ls -la
+
+      - name: Localiser le dossier backend
+        id: locate
+        run: |
+          if [ -d app/backend ]; then
+            echo "BACKEND_DIR=app/backend" >> "$GITHUB_ENV"
+          elif [ -d backend ]; then
+            echo "BACKEND_DIR=backend" >> "$GITHUB_ENV"
+          else
+            echo "::error ::Aucun dossier backend trouvé (attendu: app/backend ou backend)"
+            exit 1
+          fi
+          echo "Chemin retenu: $BACKEND_DIR"
+
+      - name: Debug tree (backend)
+        run: |
+          ls -la "$BACKEND_DIR" || true
+          ls -la "$BACKEND_DIR"/package*.json || true
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            ${{ env.BACKEND_DIR }}/package-lock.json
+            ${{ env.BACKEND_DIR }}/npm-shrinkwrap.json
+
+      - name: Install deps
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Set test env
+        run: |
+          echo "NODE_ENV=test" >> $GITHUB_ENV
+          echo "JWT_SECRET=test_secret_key" >> $GITHUB_ENV
+
+      - name: Run tests with coverage
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: npm run test -- --coverage
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: ${{ env.BACKEND_DIR }}/coverage
