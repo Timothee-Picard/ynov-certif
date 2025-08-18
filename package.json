@@ -1,6 +1,8 @@
 {
   "name": "ynov-certif",
   "version": "2.0.0",
+  "description": "todo app for Ynov certification",
+  "license": "MIT",
   "scripts": {
     "release": "standard-version",
     "release:patch": "standard-version --release-as patch",
