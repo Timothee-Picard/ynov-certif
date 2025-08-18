@@ -1,0 +1,31 @@
+name: Mirror tag to release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository (with tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout the tag that triggered the workflow
+        run: |
+          git checkout "$GITHUB_REF_NAME"
+
+      - name: Configure git author
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Force-push tag contents to 'release' branch
+        run: |
+          git push origin HEAD:release --force
