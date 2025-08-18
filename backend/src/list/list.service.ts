@@ -1,111 +1,103 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { List } from './entities/list.entity';
-import { User } from '../user/entities/user.entity';
-import { CreateListDto } from './dto/create-list.dto';
-import { UpdateListDto } from './dto/update-list.dto';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { List } from './entities/list.entity'
+import { User } from '../user/entities/user.entity'
+import { CreateListDto } from './dto/create-list.dto'
+import { UpdateListDto } from './dto/update-list.dto'
 
 @Injectable()
 export class ListService {
-  constructor(
-    @InjectRepository(List)
-    private readonly listRepository: Repository<List>,
+    constructor(
+        @InjectRepository(List)
+        private readonly listRepository: Repository<List>,
 
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-  ) {}
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+    ) {}
 
-  async create(userId: string, createListDto: CreateListDto) {
-    const list = this.listRepository.create({
-      name: createListDto.name,
-      description: createListDto.description,
-      color: createListDto.color,
-      user: { id: userId },
-    });
+    async create(userId: string, createListDto: CreateListDto) {
+        const list = this.listRepository.create({
+            name: createListDto.name,
+            description: createListDto.description,
+            color: createListDto.color,
+            user: { id: userId },
+        })
 
-    return this.listRepository.save(list);
-  }
-
-  async findAllByUser(userId: string) {
-    const lists = await this.listRepository.find({
-      where: {
-        user: { id: userId },
-      },
-      relations: ['tasks'],
-    });
-
-    return lists.map(({ tasks, ...list }) => ({
-      ...list,
-      tasksCount: tasks.length,
-      completedTasksCount: tasks.filter(task => task.isCompleted).length,
-    }));
-  }
-
-  async findOneByUser(userId: string, listId: string) {
-    const list = await this.listRepository.findOne({
-      where: {
-        id: listId,
-        user: { id: userId },
-      },
-    });
-
-    if (!list) {
-      throw new NotFoundException(
-        `Liste #${listId} non trouvée pour l'utilisateur #${userId}`,
-      );
+        return this.listRepository.save(list)
     }
 
-    return list;
-  }
+    async findAllByUser(userId: string) {
+        const lists = await this.listRepository.find({
+            where: {
+                user: { id: userId },
+            },
+            relations: ['tasks'],
+        })
 
-  async update(userId: string, id: string, updateListDto: UpdateListDto) {
-    const list = await this.listRepository.findOne({
-      where: { id },
-      relations: ['user', 'tasks'],
-    });
-    if (!list) throw new NotFoundException('List not found');
-
-    if (list.user.id !== userId) {
-      throw new ForbiddenException(
-        "Vous n'êtes pas le propriétaire de cette liste",
-      );
+        return lists.map(({ tasks, ...list }) => ({
+            ...list,
+            tasksCount: tasks.length,
+            completedTasksCount: tasks.filter((task) => task.isCompleted).length,
+        }))
     }
 
-    if (updateListDto.name !== undefined) {
-      list.name = updateListDto.name;
+    async findOneByUser(userId: string, listId: string) {
+        const list = await this.listRepository.findOne({
+            where: {
+                id: listId,
+                user: { id: userId },
+            },
+        })
+
+        if (!list) {
+            throw new NotFoundException(
+                `Liste #${listId} non trouvée pour l'utilisateur #${userId}`,
+            )
+        }
+
+        return list
     }
 
-    if (updateListDto.description !== undefined) {
-      list.description = updateListDto.description;
+    async update(userId: string, id: string, updateListDto: UpdateListDto) {
+        const list = await this.listRepository.findOne({
+            where: { id },
+            relations: ['user', 'tasks'],
+        })
+        if (!list) throw new NotFoundException('List not found')
+
+        if (list.user.id !== userId) {
+            throw new ForbiddenException("Vous n'êtes pas le propriétaire de cette liste")
+        }
+
+        if (updateListDto.name !== undefined) {
+            list.name = updateListDto.name
+        }
+
+        if (updateListDto.description !== undefined) {
+            list.description = updateListDto.description
+        }
+
+        if (updateListDto.color !== undefined) {
+            list.color = updateListDto.color
+        }
+
+        return this.listRepository.save(list)
     }
 
-    if (updateListDto.color !== undefined) {
-      list.color = updateListDto.color;
+    async remove(userId: string, id: string) {
+        const list = await this.listRepository.findOne({
+            where: { id: id },
+            relations: ['user'],
+        })
+
+        if (!list) throw new NotFoundException('List not found')
+
+        if (list.user.id !== userId) {
+            throw new ForbiddenException("Vous n'êtes pas autorisé à supprimer cette liste")
+        }
+
+        await this.listRepository.remove(list)
+        return { message: 'List deleted successfully' }
     }
-
-    return this.listRepository.save(list);
-  }
-
-  async remove(userId: string, id: string) {
-    const list = await this.listRepository.findOne({
-      where: { id: id },
-      relations: ['user'],
-    });
-
-    if (!list) throw new NotFoundException('List not found');
-
-    if (list.user.id !== userId) {
-      throw new ForbiddenException(
-        "Vous n'êtes pas autorisé à supprimer cette liste",
-      );
-    }
-
-    await this.listRepository.remove(list);
-    return { message: 'List deleted successfully' };
-  }
 }

@@ -2,7 +2,7 @@ name: backend-ci
 
 on:
   pull_request:
-    branches: [ main, develop]
+    branches: [ main, develop ]
     paths:
       - 'backend/**'
       - '.github/workflows/ci-backend.yml'
@@ -10,6 +10,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      CI: true
+      JWT_SECRET: test_secret_key
+      TZ: Europe/Paris
 
     steps:
       - name: Checkout
@@ -56,14 +62,21 @@ jobs:
             npm install
           fi
 
-      - name: Set test env
-        run: |
-          echo "NODE_ENV=test" >> $GITHUB_ENV
-          echo "JWT_SECRET=test_secret_key" >> $GITHUB_ENV
+      - name: Lint strict
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: npm run lint:strict
+
+      - name: Format check
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: npm run format:check
+
+      - name: Type check
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: npm run typecheck
 
       - name: Run tests with coverage
         working-directory: ${{ env.BACKEND_DIR }}
-        run: npm run test -- --coverage
+        run: npm run test:ci
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
