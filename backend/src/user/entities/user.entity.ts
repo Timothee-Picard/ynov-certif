@@ -1,32 +1,26 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  OneToMany,
-} from 'typeorm';
-import { List } from '../../list/entities/list.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm'
+import { List } from '../../list/entities/list.entity'
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
-  @Column()
-  username: string;
+    @Column()
+    username: string
 
-  @Column({ unique: true })
-  email: string;
+    @Column({ unique: true })
+    email: string
 
-  @Column()
-  password: string;
+    @Column()
+    password: string
 
-  @Column({ nullable: true })
-  avatar?: string;
+    @Column({ nullable: true })
+    avatar?: string
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @CreateDateColumn()
+    createdAt: Date
 
-  @OneToMany(() => List, (list) => list.user, { cascade: true })
-  lists: List[];
+    @OneToMany(() => List, (list) => list.user, { cascade: true })
+    lists: List[]
 }
