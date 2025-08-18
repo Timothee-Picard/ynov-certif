@@ -1,4 +1,3 @@
-// eslint.config.mjs
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { FlatCompat } from '@eslint/eslintrc'
@@ -12,7 +11,7 @@ const __dirname = dirname(__filename)
 
 const compat = new FlatCompat({ baseDirectory: __dirname })
 
-export default [
+const config = [
     { ignores: ['.next/**', 'node_modules/**', 'coverage/**', 'dist/**'] },
 
     // Règles Next.js + TypeScript
@@ -37,3 +36,5 @@ export default [
     // Doit être en dernier pour neutraliser les conflits de formatage
     prettier,
 ]
+
+export default config

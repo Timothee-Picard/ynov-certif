@@ -5,8 +5,18 @@ import { TaskForm } from '@/components/Tasks/TaskForm'
 
 const inputVal = (el: HTMLElement) => (el as HTMLInputElement).value
 
+// Type du payload attendu par onSave
+type SavePayload = {
+    title: string
+    description?: string
+    isCompleted?: boolean
+    priority?: 'low' | 'medium' | 'high'
+    dueDate?: string | null
+}
+
 describe('TaskForm', () => {
-    const onSave = jest.fn<Promise<void>, any[]>().mockResolvedValue(undefined)
+    // onSave: retourne une Promise<void>, prend un seul argument SavePayload
+    const onSave = jest.fn<Promise<void>, [SavePayload]>().mockResolvedValue(undefined)
     const onCancel = jest.fn()
 
     beforeEach(() => {
@@ -89,7 +99,7 @@ describe('TaskForm', () => {
             priority: 'high',
         })
         expect(typeof payload.dueDate).toBe('string')
-        expect(payload.dueDate.startsWith('2025-12-24')).toBe(true)
+        expect(payload.dueDate?.startsWith('2025-12-24')).toBe(true)
     })
 
     it('soumet les données (édition) et transmet isCompleted', async () => {
@@ -136,20 +146,16 @@ describe('TaskForm', () => {
     })
 
     it('ferme via le bouton "Annuler" et via le bouton (X)', async () => {
-        const { unmount, getByTestId } = render(
-            <TaskForm task={null} onSave={onSave} onCancel={onCancel} />,
-        )
+        const { unmount } = render(<TaskForm task={null} onSave={onSave} onCancel={onCancel} />)
 
-        await userEvent.click(getByTestId('taskform-cancel'))
+        await userEvent.click(screen.getByTestId('taskform-cancel'))
         expect(onCancel).toHaveBeenCalledTimes(1)
 
         unmount()
 
-        const { getByTestId: getByTestId2 } = render(
-            <TaskForm task={null} onSave={onSave} onCancel={onCancel} />,
-        )
+        render(<TaskForm task={null} onSave={onSave} onCancel={onCancel} />)
 
-        await userEvent.click(getByTestId2('taskform-close'))
+        await userEvent.click(screen.getByTestId('taskform-close'))
         expect(onCancel).toHaveBeenCalledTimes(2)
     })
 

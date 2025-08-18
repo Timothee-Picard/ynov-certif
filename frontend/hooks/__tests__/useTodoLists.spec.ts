@@ -2,17 +2,21 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { useTodoLists } from '@/hooks/useTodoLists'
 import type { TodoList } from '@/utils/types'
 
-const getTodoLists = jest.fn()
-const createTodoList = jest.fn()
-const updateTodoList = jest.fn()
-const deleteTodoList = jest.fn()
+type CreatePayload = { name: string; description?: string; color: string }
+type UpdatePayload = Partial<CreatePayload>
+
+const getTodoLists: jest.Mock<Promise<TodoList[]>, []> = jest.fn()
+const createTodoList: jest.Mock<Promise<TodoList>, [CreatePayload]> = jest.fn()
+const updateTodoList: jest.Mock<Promise<TodoList>, [string, UpdatePayload]> = jest.fn()
+const deleteTodoList: jest.Mock<Promise<void>, [string]> = jest.fn()
 
 jest.mock('@/utils/Api', () => ({
     todoListApi: {
-        getTodoLists: (...args: any[]) => getTodoLists(...args),
-        createTodoList: (...args: any[]) => createTodoList(...args),
-        updateTodoList: (...args: any[]) => updateTodoList(...args),
-        deleteTodoList: (...args: any[]) => deleteTodoList(...args),
+        getTodoLists: (): Promise<TodoList[]> => getTodoLists(),
+        createTodoList: (data: CreatePayload): Promise<TodoList> => createTodoList(data),
+        updateTodoList: (id: string, data: UpdatePayload): Promise<TodoList> =>
+            updateTodoList(id, data),
+        deleteTodoList: (id: string): Promise<void> => deleteTodoList(id),
     },
 }))
 

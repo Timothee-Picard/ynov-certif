@@ -20,18 +20,25 @@ jest.mock('@/contexts/AuthContext', () => ({
     }),
 }))
 
-const mockUpdateProfile = jest.fn()
-const mockDeleteProfile = jest.fn()
+const mockUpdateProfile: jest.Mock = jest.fn()
+const mockDeleteProfile: jest.Mock = jest.fn()
 jest.mock('@/utils/Api', () => ({
     userApi: {
-        updateProfile: (...args: any[]) => mockUpdateProfile(...args),
-        deleteProfile: (...args: any[]) => mockDeleteProfile(...args),
+        updateProfile: (...args: unknown[]) => (mockUpdateProfile as jest.Mock)(...args),
+        deleteProfile: (...args: unknown[]) => (mockDeleteProfile as jest.Mock)(...args),
     },
 }))
 
-jest.mock('next/image', () => (props: any) => {
-    // eslint-disable-next-line jsx-a11y/alt-text
-    return <img {...props} />
+jest.mock('next/image', () => {
+    const MockNextImage = React.forwardRef<
+        HTMLImageElement,
+        React.ImgHTMLAttributes<HTMLImageElement>
+    >((props, ref) => {
+        // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+        return <img ref={ref} {...props} />
+    })
+    MockNextImage.displayName = 'NextImageMock'
+    return { __esModule: true, default: MockNextImage }
 })
 
 import { ProfileForm } from '@/components/Profile/ProfileForm'
@@ -148,8 +155,8 @@ describe('ProfileForm', () => {
         resolvePromise!({ ...baseUser })
         await waitFor(() => {
             expect(saveBtn).toBeEnabled()
-            expect(saveBtn).toHaveAttribute('aria-busy', 'false')
         })
+        expect(saveBtn).toHaveAttribute('aria-busy', 'false')
     })
 
     it('ne supprime pas le compte si confirm() renvoie false', async () => {
@@ -173,8 +180,8 @@ describe('ProfileForm', () => {
 
         await waitFor(() => {
             expect(mockDeleteProfile).toHaveBeenCalledTimes(1)
-            expect(mockLogout).toHaveBeenCalledTimes(1)
         })
+        expect(mockLogout).toHaveBeenCalledTimes(1)
 
         expect(screen.getByTestId('profile-success')).toHaveTextContent(
             'Compte supprimé avec succès.',

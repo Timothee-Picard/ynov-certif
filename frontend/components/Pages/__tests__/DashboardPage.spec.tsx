@@ -3,13 +3,28 @@ import { render, screen, within, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { DashboardPage } from '@/components/Pages/DashboardPage'
 
-let mockLists: any[] = []
+type TodoList = {
+    id: string
+    name: string
+    description?: string
+    tasksCount?: number
+    completedTasksCount?: number
+    color?: string
+}
+
+type CreateOrUpdatePayload = {
+    name: string
+    description?: string
+    color?: string
+}
+
+let mockLists: TodoList[] = []
 let mockLoading = false
 let mockError: string | null = null
 
-const mockCreate = jest.fn()
-const mockUpdate = jest.fn()
-const mockDelete = jest.fn()
+const mockCreate = jest.fn<void, [CreateOrUpdatePayload]>()
+const mockUpdate = jest.fn<void, [string, CreateOrUpdatePayload]>()
+const mockDelete = jest.fn<void, [string]>()
 
 jest.mock('@/hooks/useTodoLists', () => ({
     useTodoLists: () => ({
@@ -27,8 +42,15 @@ jest.mock('next/navigation', () => ({
     useRouter: () => ({ push }),
 }))
 
-jest.mock('@/components/TodoLists/TodoListCard', () => ({
-    TodoListCard: ({ todoList, onEdit, onDelete, onSelect }: any) => (
+jest.mock('@/components/TodoLists/TodoListCard', () => {
+    type Props = {
+        todoList: TodoList
+        onEdit: (list: TodoList) => void
+        onDelete: (id: string) => void
+        onSelect: () => void
+    }
+
+    const TodoListCard = ({ todoList, onEdit, onDelete, onSelect }: Props) => (
         <div data-testid={`card-${todoList.id}`}>
             <span data-testid="card-title">{todoList.name}</span>
             <button onClick={() => onEdit(todoList)} data-testid={`edit-${todoList.id}`}>
@@ -41,11 +63,20 @@ jest.mock('@/components/TodoLists/TodoListCard', () => ({
                 open
             </button>
         </div>
-    ),
-}))
+    )
 
-jest.mock('@/components/TodoLists/TodoListForm', () => ({
-    TodoListForm: ({ list, onSave, onCancel, loading }: any) => (
+    return { TodoListCard }
+})
+
+jest.mock('@/components/TodoLists/TodoListForm', () => {
+    type Props = {
+        list?: TodoList | null
+        onSave: (data: CreateOrUpdatePayload) => void
+        onCancel: () => void
+        loading?: boolean
+    }
+
+    const TodoListForm = ({ list, onSave, onCancel, loading }: Props) => (
         <div data-testid="list-form" aria-busy={loading ? 'true' : 'false'}>
             <div data-testid="form-mode">{list ? 'editing' : 'creating'}</div>
             <button
@@ -64,8 +95,10 @@ jest.mock('@/components/TodoLists/TodoListForm', () => ({
                 cancel
             </button>
         </div>
-    ),
-}))
+    )
+
+    return { TodoListForm }
+})
 
 describe('DashboardPage', () => {
     beforeEach(() => {

@@ -9,6 +9,7 @@
         "lint": "next lint",
         "lint:strict": "eslint . --max-warnings=0",
         "lint:fix": "eslint . --fix",
+        "typecheck": "tsc --noEmit",
         "format": "prettier . --write",
         "format:check": "prettier . --check",
         "fix": "npm run lint:fix && npm run format",

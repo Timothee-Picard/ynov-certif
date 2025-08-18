@@ -6,7 +6,7 @@ jest.mock('@/components/Auth/LoginForm', () => ({
     LoginForm: ({ onSwitchToRegister }: { onSwitchToRegister: () => void }) => (
         <div data-testid="login-form-mock">
             <button onClick={onSwitchToRegister} data-testid="switch-to-register">
-                Aller à l'inscription
+                Aller à l&#39;inscription
             </button>
         </div>
     ),

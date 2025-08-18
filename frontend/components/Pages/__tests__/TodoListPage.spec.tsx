@@ -46,8 +46,25 @@ jest.mock('next/navigation', () => ({
     useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
 }))
 
-jest.mock('@/components/Tasks/TaskItem', () => ({
-    TaskItem: ({ task, onToggleComplete, onEdit, onDelete }: any) => (
+jest.mock('@/components/Tasks/TaskItem', () => {
+    type Task = {
+        id: string
+        title: string
+        description?: string
+        isCompleted: boolean
+        createdAt: string
+        priority?: 'low' | 'medium' | 'high'
+        dueDate?: string | null
+    }
+
+    type Props = {
+        task: Task
+        onToggleComplete: (id: string) => void
+        onEdit: (task: Task) => void
+        onDelete: (id: string) => void
+    }
+
+    const TaskItem = ({ task, onToggleComplete, onEdit, onDelete }: Props) => (
         <div data-testid={`task-${task.id}`}>
             <span>{task.title}</span>
             <button data-testid={`toggle-${task.id}`} onClick={() => onToggleComplete(task.id)}>
@@ -60,11 +77,38 @@ jest.mock('@/components/Tasks/TaskItem', () => ({
                 delete
             </button>
         </div>
-    ),
-}))
+    )
 
-jest.mock('@/components/Tasks/TaskForm', () => ({
-    TaskForm: ({ task, onSave, onCancel, loading }: any) => (
+    return { TaskItem }
+})
+
+jest.mock('@/components/Tasks/TaskForm', () => {
+    type Task = {
+        id: string
+        title: string
+        description?: string
+        isCompleted: boolean
+        createdAt: string
+        priority?: 'low' | 'medium' | 'high'
+        dueDate?: string | null
+    }
+
+    type SavePayload = {
+        title: string
+        description?: string
+        isCompleted?: boolean
+        priority?: 'low' | 'medium' | 'high'
+        dueDate?: string | null
+    }
+
+    type Props = {
+        task?: Task | null
+        onSave: (data: SavePayload) => void
+        onCancel: () => void
+        loading?: boolean
+    }
+
+    const TaskForm = ({ task, onSave, onCancel, loading }: Props) => (
         <div data-testid="task-form-content" aria-busy={loading ? 'true' : 'false'}>
             <div data-testid="task-form-mode">{task ? 'editing' : 'creating'}</div>
             <button
@@ -85,8 +129,10 @@ jest.mock('@/components/Tasks/TaskForm', () => ({
                 cancel
             </button>
         </div>
-    ),
-}))
+    )
+
+    return { TaskForm }
+})
 
 describe('TodoListPage', () => {
     beforeEach(() => {

@@ -1,5 +1,47 @@
 import type { AuthToken, User, TodoList, Task } from '@/utils/types'
 
+type AuthApi = {
+    login: (p: { email: string; password: string }) => Promise<AuthToken>
+    register: (p: { username: string; email: string; password: string }) => Promise<AuthToken>
+    validateToken: (token: string) => Promise<AuthToken | null>
+}
+
+type UserApi = {
+    getProfile: () => Promise<User>
+    updateProfile: (p: Partial<Pick<User, 'username' | 'email' | 'avatar'>>) => Promise<User>
+    deleteProfile: () => Promise<void>
+}
+
+type TodoListCreate = { name: string; description?: string; color: string }
+type TodoListUpdate = Partial<TodoListCreate>
+
+type TodoListApi = {
+    getTodoLists: () => Promise<TodoList[]>
+    createTodoList: (p: TodoListCreate) => Promise<TodoList>
+    updateTodoList: (id: string, p: TodoListUpdate) => Promise<TodoList>
+    deleteTodoList: (id: string) => Promise<void>
+    getTodoListById: (id: string) => Promise<TodoList | null>
+}
+
+type TaskCreate = {
+    title: string
+    description?: string
+    priority: 'low' | 'medium' | 'high'
+    isCompleted: boolean
+    dueDate?: string | null
+}
+type TaskUpdate = Partial<TaskCreate>
+
+type TaskApi = {
+    getTasks: (listId: string) => Promise<Task[]>
+    createTask: (listId: string, p: TaskCreate) => Promise<Task>
+    updateTask: (taskId: string, p: TaskUpdate) => Promise<Task>
+    deleteTask: (taskId: string) => Promise<void>
+    toggleTaskComplete: (taskId: string) => Promise<Task>
+}
+
+type MockFetchInit = { ok: boolean; status: number; json?: unknown; text?: string }
+
 const API_BASE = 'https://api.example.com'
 
 const makeUser = (o: Partial<User> = {}): User => ({
@@ -42,14 +84,14 @@ const makeTask = (o: Partial<Task> = {}): Task => ({
     ...o,
 })
 
-let authApi: any
-let userApi: any
-let todoListApi: any
-let taskApi: any
+let authApi: AuthApi
+let userApi: UserApi
+let todoListApi: TodoListApi
+let taskApi: TaskApi
 
 const silenceLog = jest.spyOn(console, 'log').mockImplementation(() => {})
 
-const mockFetchOnce = (init: { ok: boolean; status: number; json?: any; text?: string }) => {
+const mockFetchOnce = (init: MockFetchInit) => {
     ;(global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: init.ok,
         status: init.status,
@@ -58,7 +100,7 @@ const mockFetchOnce = (init: { ok: boolean; status: number; json?: any; text?: s
     })
 }
 
-beforeEach(() => {
+beforeEach(async () => {
     jest.resetModules()
 
     process.env.NEXT_PUBLIC_API_URL = API_BASE
@@ -82,10 +124,14 @@ beforeEach(() => {
         writable: true,
     })
 
-    global.fetch = jest.fn() as any
+    global.fetch = jest.fn() as jest.Mock
 
-    // importe le module APRÈS avoir fixé env, fetch et localStorage
-    const apis = require('@/utils/Api')
+    const apis = (await import('@/utils/Api')) as {
+        authApi: AuthApi
+        userApi: UserApi
+        todoListApi: TodoListApi
+        taskApi: TaskApi
+    }
     authApi = apis.authApi
     userApi = apis.userApi
     todoListApi = apis.todoListApi

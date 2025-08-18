@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event'
 import { TodoListForm } from '@/components/TodoLists/TodoListForm'
 import type { TodoList } from '@/utils/types'
 
+type SavePayload = { name: string; description?: string; color: string }
+
 const baseList = (overrides: Partial<TodoList> = {}): TodoList => ({
     id: 'list-1',
     userId: 'u1',
@@ -18,7 +20,7 @@ const baseList = (overrides: Partial<TodoList> = {}): TodoList => ({
 })
 
 describe('TodoListForm', () => {
-    const onSave = jest.fn<Promise<void>, any[]>().mockResolvedValue(undefined)
+    const onSave = jest.fn<Promise<void>, [SavePayload]>().mockResolvedValue(undefined)
     const onCancel = jest.fn()
 
     beforeEach(() => {
@@ -74,8 +76,8 @@ describe('TodoListForm', () => {
 
         await waitFor(() => {
             expect(newBtn).toHaveAttribute('aria-checked', 'true')
-            expect(oldBtn).toHaveAttribute('aria-checked', 'false')
         })
+        expect(oldBtn).not.toBeChecked()
     })
 
     it('désactive "Sauvegarder" si le titre est vide, puis l’active après saisie', async () => {
@@ -123,18 +125,13 @@ describe('TodoListForm', () => {
     it('ferme via le bouton "Annuler" puis via le bouton (X) en démontant entre les rendus', async () => {
         const user = userEvent.setup()
 
-        const { unmount, getByTestId } = render(
-            <TodoListForm list={null} onSave={onSave} onCancel={onCancel} />,
-        )
-        await user.click(getByTestId('todolistform-cancel'))
-        expect(onCancel).toHaveBeenCalledTimes(1)
+        const { unmount } = render(<TodoListForm list={null} onSave={onSave} onCancel={onCancel} />)
+        await user.click(screen.getByTestId('todolistform-cancel'))
 
         unmount()
 
-        const { getByTestId: getByTestId2 } = render(
-            <TodoListForm list={null} onSave={onSave} onCancel={onCancel} />,
-        )
-        await user.click(getByTestId2('todolistform-close'))
+        render(<TodoListForm list={null} onSave={onSave} onCancel={onCancel} />)
+        await user.click(screen.getByTestId('todolistform-close'))
         expect(onCancel).toHaveBeenCalledTimes(2)
     })
 

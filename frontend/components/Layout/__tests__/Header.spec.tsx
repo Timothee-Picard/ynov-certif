@@ -3,8 +3,15 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Header } from '@/components/Layout/Header'
 
+type MockUser = {
+    id: string
+    username: string
+    email: string
+    avatar: string | null
+}
+
 const mockLogout = jest.fn()
-let mockUser: any = { id: 'u1', username: 'Tim', email: 'tim@example.com', avatar: null }
+let mockUser: MockUser = { id: 'u1', username: 'Tim', email: 'tim@example.com', avatar: null }
 
 jest.mock('@/contexts/AuthContext', () => ({
     useAuth: () => ({ user: mockUser, logout: mockLogout }),
@@ -18,9 +25,16 @@ jest.mock('next/navigation', () => ({
     usePathname: () => mockPathname,
 }))
 
-jest.mock('next/image', () => (props: any) => {
-    // eslint-disable-next-line jsx-a11y/alt-text
-    return <img {...props} />
+jest.mock('next/image', () => {
+    const MockNextImage = React.forwardRef<
+        HTMLImageElement,
+        React.ImgHTMLAttributes<HTMLImageElement>
+    >((props, ref) => {
+        // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+        return <img ref={ref} {...props} />
+    })
+    MockNextImage.displayName = 'NextImageMock'
+    return { __esModule: true, default: MockNextImage }
 })
 
 describe('Header', () => {

@@ -4,33 +4,42 @@ import userEvent from '@testing-library/user-event'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import type { User } from '@/utils/types'
 
+type TokenData = {
+    token: string
+    expiresAt: string
+    user: User
+}
+type LoginPayload = { email: string; password: string }
+type RegisterPayload = { username: string; email: string; password: string }
+type StoredToken = { token: string } | null
+
 const push = jest.fn()
 
 jest.mock('next/navigation', () => ({
     useRouter: () => ({ push }),
 }))
 
-const validateToken = jest.fn()
-const loginApi = jest.fn()
-const registerApi = jest.fn()
+const validateToken: jest.Mock<Promise<TokenData | null>, [string]> = jest.fn()
+const loginApi: jest.Mock<Promise<TokenData>, [LoginPayload]> = jest.fn()
+const registerApi: jest.Mock<Promise<TokenData>, [RegisterPayload]> = jest.fn()
 
 jest.mock('@/utils/Api', () => ({
     authApi: {
-        validateToken: (...args: any[]) => validateToken(...args),
-        login: (...args: any[]) => loginApi(...args),
-        register: (...args: any[]) => registerApi(...args),
+        validateToken: (token: string): Promise<TokenData | null> => validateToken(token),
+        login: (data: LoginPayload): Promise<TokenData> => loginApi(data),
+        register: (data: RegisterPayload): Promise<TokenData> => registerApi(data),
     },
 }))
 
-const getTokenData = jest.fn()
-const setToken = jest.fn()
-const removeToken = jest.fn()
+const getTokenData: jest.Mock<StoredToken, []> = jest.fn()
+const setToken: jest.Mock<void, [string]> = jest.fn()
+const removeToken: jest.Mock<void, []> = jest.fn()
 
 jest.mock('@/utils/auth', () => ({
     authStorage: {
-        getTokenData: (...args: any[]) => getTokenData(...args),
-        setToken: (...args: any[]) => setToken(...args),
-        removeToken: (...args: any[]) => removeToken(...args),
+        getTokenData: (): StoredToken => getTokenData(),
+        setToken: (token: string): void => setToken(token),
+        removeToken: (): void => removeToken(),
     },
 }))
 
