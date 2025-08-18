@@ -37,7 +37,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                     } else {
                         authStorage.removeToken()
                     }
-                } catch (error) {
+                } catch {
                     authStorage.removeToken()
                 }
             }

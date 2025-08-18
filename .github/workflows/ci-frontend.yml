@@ -11,6 +11,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      NODE_ENV: test
+      CI: true
+      NEXT_PUBLIC_API_URL: https://api.example.com
+      TZ: Europe/Paris
+      NEXT_TELEMETRY_DISABLED: 1
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,12 +63,17 @@ jobs:
             npm install
           fi
 
-      - name: Set test env
-        run: |
-          echo "NODE_ENV=test" >> $GITHUB_ENV
-          echo "CI=true" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_API_URL=https://api.example.com" >> $GITHUB_ENV
-          echo "TZ=Europe/Paris" >> $GITHUB_ENV
+      - name: Lint strict
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm run lint:strict
+
+      - name: Format check
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm run format:check
+
+      - name: Type check
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm run typecheck
 
       - name: Run tests with coverage
         working-directory: ${{ env.FRONTEND_DIR }}

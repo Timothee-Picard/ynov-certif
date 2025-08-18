@@ -6,7 +6,7 @@ const getTodoListById = jest.fn()
 
 jest.mock('@/utils/Api', () => ({
     todoListApi: {
-        getTodoListById: (...args: any[]) => getTodoListById(...args),
+        getTodoListById: (...args: unknown[]) => (getTodoListById as jest.Mock)(...args),
     },
 }))
 
