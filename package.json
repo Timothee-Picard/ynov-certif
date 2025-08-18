@@ -3,6 +3,9 @@
   "version": "1.2.0",
   "scripts": {
     "release": "standard-version",
+    "release:patch": "standard-version --release-as patch",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
     "release:push": "git push --follow-tags origin main"
   },
   "devDependencies": {
