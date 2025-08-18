@@ -89,5 +89,23 @@ La branche main est déployée en préproduction.
 
 Le tag Git déclenche le déploiement en production.
 
+---
+
+## 📚 Documentation
+- swagger : [https://ynov-certif-back-preprod.timothee-picard.dev/api](https://ynov-certif-back-preprod.timothee-picard.dev/api)
+---
+## 🧑‍💻 Contribuer
+Contributions bienvenues !
+1. Forkez le projet
+2. Créez une branche (`git checkout -b feature/ma-fonctionnalite`)
+3. Commitez vos changements (`git commit -m 'Ajout de ma fonctionnalité'`)
+4. Poussez la branche (`git push origin feature/ma-fonctionnalite`)
+5. Ouvrez une Pull Request sur GitHub
+6. Attendez la revue et les tests CI
+7. Une fois validée, la PR sera mergée et déployée en préproduction automatiquement
+---
+## 📖 Auteurs
+- **Timothée Picard** – [GitHub](https://github.com/Timothee-Picard) | [LinkedIn](https://www.linkedin.com/in/timothee-picard/) | [Site](https://timothee-picard.dev)
+---
 ## 📜 Licence
 Ce projet est sous licence [MIT](./LICENSE).
