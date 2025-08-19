@@ -4,6 +4,7 @@ import { User, LoginCredentials, RegisterCredentials } from '@/utils/types'
 import { authApi } from '@/utils/Api'
 import { authStorage } from '@/utils/auth'
 import { useRouter } from 'next/navigation'
+import { Record } from '@sinclair/typebox'
 
 interface AuthContextType {
     user: User | null
@@ -20,11 +21,64 @@ interface AuthProviderProps {
     children: ReactNode
 }
 
+type ApiLikeError = { status?: number; message?: string }
+const isUnauthorized = (e: unknown) =>
+    typeof (e as ApiLikeError)?.status === 'number' && (e as ApiLikeError).status === 401
+
+type ApiErrorResponse = {
+    message?: string | string[]
+    statusCode?: number
+    error?: string
+}
+
+export function normalizeError(e: unknown): Error {
+    if (
+        typeof e === 'object' &&
+        e !== null &&
+        'response' in e &&
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        typeof (e as Record<string, unknown>).response?.data !== 'undefined'
+    ) {
+        const data = (e as { response: { data: ApiErrorResponse } }).response.data
+        const msg = Array.isArray(data.message) ? data.message.join(', ') : data.message
+        return new Error(msg || 'Erreur de connexion')
+    }
+
+    if (e instanceof Error) {
+        const m = e.message
+        if (m && m.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(m) as ApiErrorResponse
+                return new Error(
+                    (typeof parsed.message === 'string' ? parsed.message : undefined) ||
+                        'Erreur de connexion',
+                )
+            } catch {
+                return new Error(m)
+            }
+        }
+        return new Error(m || 'Erreur de connexion')
+    }
+
+    if (typeof e === 'object' && e !== null && 'message' in e) {
+        const msg = (e as { message?: unknown }).message
+        return new Error(typeof msg === 'string' ? msg : 'Erreur de connexion')
+    }
+
+    return new Error('Erreur de connexion')
+}
+
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
 
     const router = useRouter()
+
+    const hardLogout = () => {
+        authStorage.removeToken()
+        setUser(null)
+    }
 
     useEffect(() => {
         const initAuth = async () => {
@@ -35,10 +89,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
                     if (validUser) {
                         setUser(validUser.user)
                     } else {
-                        authStorage.removeToken()
+                        hardLogout()
                     }
-                } catch {
-                    authStorage.removeToken()
+                } catch (e) {
+                    isUnauthorized(e)
+                    hardLogout()
                 }
             }
             setLoading(false)
@@ -54,6 +109,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
             authStorage.setToken(tokenData)
             localStorage.setItem('token', tokenData.token)
             setUser(tokenData.user)
+        } catch (e) {
+            throw normalizeError(e)
         } finally {
             setLoading(false)
         }
@@ -66,14 +123,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
             authStorage.setToken(tokenData)
             localStorage.setItem('token', tokenData.token)
             setUser(tokenData.user)
+        } catch (e) {
+            if (isUnauthorized(e)) {
+                throw new Error('Identifiants incorrects')
+            }
+            throw e
         } finally {
             setLoading(false)
         }
     }
 
     const logout = () => {
-        authStorage.removeToken()
-        setUser(null)
+        hardLogout()
         router.push('/')
     }
 

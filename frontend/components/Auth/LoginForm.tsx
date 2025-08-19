@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { Mail, Lock, Loader2 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -14,14 +14,27 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
     })
     const [error, setError] = useState('')
 
+    useEffect(() => {
+        console.log(error)
+    }, [error])
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        setError('')
 
         try {
+            setError('Une erreur est survenue')
             await login(formData)
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Erreur de connexion')
+            const message =
+                err instanceof Error
+                    ? err.message
+                    : typeof err === 'string'
+                      ? err
+                      : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-expect-error
+                        err?.message || 'Une erreur est survenue'
+            console.log('Y a une erreur lors de la connexion', message, err)
+            setError(message)
         }
     }
 
@@ -30,6 +43,7 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
             ...prev,
             [e.target.name]: e.target.value,
         }))
+        if (error) setError('')
     }
 
     const errorId = 'login-error'
@@ -49,8 +63,9 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
                     className="space-y-6"
                     aria-labelledby="login-title"
                     data-testid="login-form"
+                    noValidate
                 >
-                    {error && (
+                    {!!error && (
                         <div
                             id={errorId}
                             role="alert"
