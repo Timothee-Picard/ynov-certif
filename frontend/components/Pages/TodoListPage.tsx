@@ -7,6 +7,8 @@ import { TaskItem } from '@/components/Tasks/TaskItem'
 import { TaskForm } from '@/components/Tasks/TaskForm'
 import { useRouter } from 'next/navigation'
 import { useTodoList } from '@/hooks/useTodoList'
+import { useAuth } from '@/contexts/AuthContext'
+import Link from 'next/link'
 
 interface TodoListPageProps {
     id: string
@@ -15,6 +17,7 @@ interface TodoListPageProps {
 type FilterType = 'all' | 'pending' | 'completed'
 
 export function TodoListPage({ id }: TodoListPageProps) {
+    const { user } = useAuth()
     const { todoList, loading: listLoading, error: listError } = useTodoList(id)
     const {
         tasks,
@@ -86,6 +89,21 @@ export function TodoListPage({ id }: TodoListPageProps) {
         setEditingTask(null)
     }
 
+    if (!user) {
+        return (
+            <div className="flex flex-col items-center justify-center text-center">
+                <h1 className="text-4xl font-bold text-gray-800 mb-4">401</h1>
+                <p className="text-gray-600 mb-6">Veuillez vous connecter pour accéder à cette page.</p>
+                <Link
+                    href="/"
+                    className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+                >
+                    Retour à l’accueil
+                </Link>
+            </div>
+        )
+    }
+
     if ((tasksLoading && tasks.length === 0) || listLoading) {
         return (
             <div
@@ -101,21 +119,15 @@ export function TodoListPage({ id }: TodoListPageProps) {
 
     if (!todoList) {
         return (
-            <div
-                className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
-                data-testid="list-not-found"
-            >
-                <div className="text-center text-gray-600">
-                    <p>La liste de tâches n&apos;a pas été trouvée.</p>
-                    <button
-                        onClick={() => router.push('/')}
-                        className="mt-4 text-blue-600 hover:text-blue-700"
-                        aria-label="Retour aux listes de tâches"
-                        data-testid="back-to-lists"
-                    >
-                        Retour aux listes de tâches
-                    </button>
-                </div>
+            <div className="flex flex-col items-center justify-center text-center">
+                <h1 className="text-4xl font-bold text-gray-800 mb-4">404</h1>
+                <p className="text-gray-600 mb-6">La liste de tâches n&apos;a pas été trouvée</p>
+                <Link
+                    href="/"
+                    className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+                >
+                    Retour aux listes de tâches
+                </Link>
             </div>
         )
     }
@@ -126,8 +138,7 @@ export function TodoListPage({ id }: TodoListPageProps) {
     const filterLabelId = 'tasks-filter-label'
 
     return (
-        <main
-            className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        <div
             aria-labelledby={titleId}
             data-testid="todolist-root"
         >
@@ -360,6 +371,6 @@ export function TodoListPage({ id }: TodoListPageProps) {
                     />
                 </div>
             )}
-        </main>
+        </div>
     )
 }

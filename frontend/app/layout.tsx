@@ -13,9 +13,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <html lang="fr">
             <body>
                 <AuthProvider>
-                    <div className="min-h-screen bg-gray-50 text-gray-900">
+                    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900">
                         <Header />
-                        <main>{children}</main>
+                        <main className="grow">{children}</main>
                     </div>
                 </AuthProvider>
             </body>
