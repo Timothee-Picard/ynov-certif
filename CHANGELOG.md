@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/Timothee-Picard/ynov-certif/compare/v2.0.0...v2.1.0) (2025-08-19)
+
+
+### Features
+
+* 404 redirect, 401 redirect and responsive menu ([e48f1bb](https://github.com/Timothee-Picard/ynov-certif/commit/e48f1bb0e68549c82264d962c772ebae001da595))
+
+
+### Bug Fixes
+
+* login loader cancel error ([56e8187](https://github.com/Timothee-Picard/ynov-certif/commit/56e8187a287d93ec60f61a30723b975d2ccf2814))
+* remove console.log ([2e3c18e](https://github.com/Timothee-Picard/ynov-certif/commit/2e3c18e46c9edecae1e2f1c3d7621a8710d2484f))
+
 ## [2.0.0](https://github.com/Timothee-Picard/ynov-certif/compare/v1.1.0...v2.0.0) (2025-08-18)
 
 
