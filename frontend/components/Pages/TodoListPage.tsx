@@ -93,7 +93,9 @@ export function TodoListPage({ id }: TodoListPageProps) {
         return (
             <div className="flex flex-col items-center justify-center text-center">
                 <h1 className="text-4xl font-bold text-gray-800 mb-4">401</h1>
-                <p className="text-gray-600 mb-6">Veuillez vous connecter pour accéder à cette page.</p>
+                <p className="text-gray-600 mb-6">
+                    Veuillez vous connecter pour accéder à cette page.
+                </p>
                 <Link
                     href="/"
                     className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
@@ -138,10 +140,7 @@ export function TodoListPage({ id }: TodoListPageProps) {
     const filterLabelId = 'tasks-filter-label'
 
     return (
-        <div
-            aria-labelledby={titleId}
-            data-testid="todolist-root"
-        >
+        <div aria-labelledby={titleId} data-testid="todolist-root">
             {/* Header */}
             <div className="mb-8" data-testid="todolist-header">
                 <div className="flex items-center space-x-4 mb-4">

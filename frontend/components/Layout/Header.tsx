@@ -3,14 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { useAuth } from '@/contexts/AuthContext'
-import {
-    User,
-    LogOut,
-    Settings,
-    CheckSquare,
-    Menu,
-    X,
-} from 'lucide-react'
+import { User, LogOut, Settings, CheckSquare, Menu, X } from 'lucide-react'
 
 export function Header() {
     const { user, logout } = useAuth()
@@ -78,9 +71,7 @@ export function Header() {
                 ) : (
                     <User className="h-8 w-8 text-gray-400" aria-hidden />
                 )}
-                <span className="text-sm font-medium text-gray-700">
-          {displayUser?.username}
-        </span>
+                <span className="text-sm font-medium text-gray-700">{displayUser?.username}</span>
             </div>
             <button
                 onClick={handleLogout}
