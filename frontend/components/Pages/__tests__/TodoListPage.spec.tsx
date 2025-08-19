@@ -10,6 +10,12 @@ jest.mock('@/hooks/useTodoList', () => ({
     }),
 }))
 
+jest.mock('@/contexts/AuthContext', () => ({
+    useAuth: () => ({
+        user: { id: 'u1', username: 'Test User' },
+    }),
+}))
+
 const mockCreateTask = jest.fn()
 const mockUpdateTask = jest.fn()
 const mockDeleteTask = jest.fn()
