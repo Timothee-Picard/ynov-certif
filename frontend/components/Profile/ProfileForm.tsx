@@ -4,6 +4,7 @@ import { User as UserIcon, Mail, Save, Loader2 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { userApi } from '@/utils/Api'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export function ProfileForm() {
     const { user, updateUser, logout } = useAuth()
@@ -77,6 +78,22 @@ export function ProfileForm() {
 
     const errorId = 'profile-error'
     const successId = 'profile-success'
+
+    if (!user) {
+        return (
+            <div className="flex flex-col items-center justify-center text-center">
+                <h1 className="text-4xl font-bold text-gray-800 mb-4">401</h1>
+                <p className="text-gray-600 mb-6">Veuillez vous connecter pour accéder à cette page.</p>
+                <Link
+                    href="/"
+                    className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition"
+                >
+                    Retour à l’accueil
+                </Link>
+            </div>
+        )
+    }
+
 
     return (
         <div className="max-w-2xl mx-auto" data-testid="profile-container">
