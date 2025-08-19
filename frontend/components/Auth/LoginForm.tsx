@@ -14,10 +14,6 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
     })
     const [error, setError] = useState('')
 
-    useEffect(() => {
-        console.log(error)
-    }, [error])
-
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
 
@@ -33,7 +29,6 @@ export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
                       : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-expect-error
                         err?.message || 'Une erreur est survenue'
-            console.log('Y a une erreur lors de la connexion', message, err)
             setError(message)
         }
     }
