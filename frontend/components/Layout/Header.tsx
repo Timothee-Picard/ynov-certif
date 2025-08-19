@@ -86,15 +86,11 @@ export function Header() {
     return (
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur shadow-sm border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Barre supérieure */}
                 <div className="flex h-16 items-center justify-between">
-                    {/* Branding */}
                     <div className="flex items-center gap-2">
                         <CheckSquare className="h-8 w-8 text-blue-600" aria-hidden />
                         <h1 className="text-xl font-bold text-gray-900">TodoApp</h1>
                     </div>
-
-                    {/* Bouton burger (mobile) */}
                     {displayUser ? (
                         <button
                             onClick={() => setIsMenuOpen((v) => !v)}
@@ -106,8 +102,6 @@ export function Header() {
                             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                         </button>
                     ) : null}
-
-                    {/* Navigation + User (desktop) */}
                     {displayUser ? (
                         <div className="hidden md:flex items-center gap-6">
                             {NavLinks}
@@ -115,9 +109,7 @@ export function Header() {
                         </div>
                     ) : null}
                 </div>
-
-                {/* Panneau mobile */}
-                {displayUser ? (
+                {displayUser && isMenuOpen ? (
                     <div
                         id="mobile-menu"
                         className={`md:hidden overflow-hidden transition-[max-height] duration-300 ${
